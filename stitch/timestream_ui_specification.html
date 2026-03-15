@@ -1,0 +1,90 @@
+# TimeStream Desktop App - UI Design Specification
+
+## 1. App Layout Structure
+- **Window Type:** Native desktop window with custom title bar
+- **Window Controls:** Minimize, Maximize, Close (custom or native)
+- **Main Layout:** Sidebar navigation + content area
+- **Minimum Size:** 1024x768px
+
+---
+
+## 2. Navigation & Pages
+**Sidebar (Left Navigation)**
+- Dashboard (Home icon)
+- Timeline (Clock icon)
+- Analytics (Chart icon)
+- Sources (Plug icon)
+- Search (Magnifier icon)
+- Settings (Gear icon)
+
+---
+
+## 3. Screen Designs
+
+### Screen 1: Dashboard (Home)
+- **Header:** Date selector, quick stats summary
+- **Stats Cards:** Today's activities count, time spent learning, streak
+- **Activity Feed:** Chronological list of today's activities
+- **Quick Actions:** Add manual entry, sync now
+
+### Screen 2: Timeline View
+- **Date Picker:** Calendar to select specific date
+- **Timeline:** Hour-by-hour or activity-by-activity view
+- **Filters:** By source (GitHub, YouTube, Browser, etc.)
+- **Categories:** Learning, Coding, Research, Communication badges
+
+### Screen 3: Analytics Page
+- **Weekly Chart:** Bar chart showing activities per day
+- **Category Breakdown:** Pie chart of activity types
+- **Top Sources:** Most active platforms
+- **Time Trends:** Learning time over weeks
+
+### Screen 4: Sources/Integrations
+- **GitHub:** Connect/disconnect, sync status
+- **YouTube:** Connect/disconnect, watch history sync
+- **Browser Extension:** Installation status, sync toggle
+- **VS Code:** Extension status, coding time tracking
+- **Manual Entries:** Add custom activity button
+
+### Screen 5: Search
+- **Search Bar:** Full-text search input
+- **Filters:** Date range, source, category
+- **Results:** List view with thumbnails (for videos/articles)
+- **Result Details:** Click to expand full info
+
+### Screen 6: Settings
+- **General:** Theme (light/dark), startup behavior
+- **Notifications:** Reminder settings
+- **Data:** Export, clear data, backup
+- **Account:** Profile, connected services
+
+---
+
+## 4. UI Components Needed
+
+### Activity Card
+- Source icon (GitHub, YouTube, etc.)
+- Title (video title, article name, commit message)
+- Time stamp
+- Category badge
+- URL link
+
+### Stats Card
+- Icon, Number, Label, Trend indicator (up/down)
+
+### Source Connection Card
+- Logo, Name, Status (connected/disconnected), Last sync time, Connect/Disconnect button
+
+### Timeline Entry
+- Time, Activity type icon, Title, Category tag, Optional thumbnail
+
+---
+
+## 5. Theme & Visuals
+- **Theme:** Dark Mode (#1a1a2e background)
+- **Accent Color:** Primary purple (#4F46E5)
+- **Activity Badge Colors:**
+  - Learning: Blue (#3B82F6)
+  - Coding: Green (#10B981)
+  - Research: Purple (#8B5CF6)
+  - Communication: Orange (#F59E0B)

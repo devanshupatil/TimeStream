@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TimeStream Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5048e5",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#121121",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">timeline</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">TimeStream</h1>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg group" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg group" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">search</span>
+<span class="font-medium">Search</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-medium">History</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-medium">Sources</span>
+</a>
+<div class="pt-8 pb-4">
+<p class="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Filters</p>
+</div>
+<div class="space-y-4 px-3">
+<div>
+<label class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">Date Range</label>
+<select class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-primary">
+<option>Last 24 hours</option>
+<option>Last 7 days</option>
+<option>Last 30 days</option>
+<option>Custom Range</option>
+</select>
+</div>
+<div>
+<label class="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2 block">Category</label>
+<div class="space-y-2">
+<label class="flex items-center gap-2 text-sm cursor-pointer">
+<input checked="" class="rounded border-slate-300 text-primary focus:ring-primary bg-transparent" type="checkbox"/>
+<span>Meetings</span>
+</label>
+<label class="flex items-center gap-2 text-sm cursor-pointer">
+<input checked="" class="rounded border-slate-300 text-primary focus:ring-primary bg-transparent" type="checkbox"/>
+<span>Articles</span>
+</label>
+<label class="flex items-center gap-2 text-sm cursor-pointer">
+<input class="rounded border-slate-300 text-primary focus:ring-primary bg-transparent" type="checkbox"/>
+<span>Media</span>
+</label>
+</div>
+</div>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- Header / Search Bar Area -->
+<header class="p-6 bg-white/50 dark:bg-background-dark/50 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-4xl mx-auto w-full">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-lg shadow-sm placeholder:text-slate-400 dark:text-white transition-all" placeholder="Search meetings, articles, transcripts..." type="text" value="Design Team sync"/>
+</div>
+<div class="mt-4 flex flex-wrap items-center gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                            Source: Zoom
+                            <span class="material-symbols-outlined text-sm">close</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold hover:bg-slate-200 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined text-sm">filter_alt</span>
+                            More Filters
+                        </button>
+</div>
+</div>
+</header>
+<!-- Results Area -->
+<section class="flex-1 overflow-y-auto p-6">
+<div class="max-w-4xl mx-auto space-y-4">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400">Search results (24)</h2>
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-400">Sort by:</span>
+<button class="text-xs font-semibold flex items-center gap-1">Relevance <span class="material-symbols-outlined text-xs">expand_more</span></button>
+</div>
+</div>
+<!-- Result Card 1 (Video) -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+<div class="flex flex-col md:flex-row">
+<div class="relative md:w-64 h-40 flex-shrink-0">
+<div class="w-full h-full bg-slate-200 dark:bg-slate-800 bg-cover bg-center" data-alt="Video call interface showing team members" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDTHX27mqTxv7nGe7QSqF7vWll_2TOSYn-iOZr5PxXUBYjcVVpYr8FJcy5_2KQtJacBE5wh1t3rmXMHdOBcU1ly05vTpUX3dZy-N4Iyjx_JrmNyxgxMj6Ftmxp_EBimMQJVeH1q5rwehV61oXYEq1gjMmnX0M9lwljHuqHLvXo1g0FQ2i45H22QwFuvklF4V8_ZHe4gW-ZdYo9e6nnuOFnlNhC4l9fKA6cxvI2XrGlkC0oDO9O6vfehUkF8rkkRnQRUxFlMHT_JVwk7')"></div>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-4xl">play_circle</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">42:15</div>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-blue-500 text-sm">videocam</span>
+<span class="text-xs font-medium text-slate-500 uppercase">Video Recording • Zoom</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Meeting with Design Team - Q4 Planning</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">Discussed the new design system roadmap and prioritized the component library update. Mentioned "TimeStream Search" as a key feature for the next sprint.</p>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Oct 12, 2023</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 10:30 AM</span>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">View Details <span class="material-symbols-outlined text-xs">arrow_forward</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Result Card 2 (Article) -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+<div class="flex flex-col md:flex-row">
+<div class="md:w-64 h-40 flex-shrink-0 bg-slate-200 dark:bg-slate-800 bg-cover bg-center" data-alt="Abstract UI design layout sketches" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDoHz_dqSmgyIyFfys6T4SYBKc604Qk6lSdLSpDQltHtlLi4N5_PBJjjrvYQY7NFhUof3iYhZcelSy-Capf-yUAwfhc4POvhSzMefGmjmb3uZfiCv1KaZ2gSz0zwq1hGvSLr98zMVPrxTvWyNanPzZakOscPNtC4iDeqC97Bvzls-YmsphpmnjsirKSY76vKhCr6cBfTNBUEJr_U0aPBZ65GixJToF7YFFQToDw8I-jqZBV5wajvQX1k75mUkecrxo0PwhTBQmIwOGp')"></div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-emerald-500 text-sm">article</span>
+<span class="text-xs font-medium text-slate-500 uppercase">Article • Chrome Browser</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Best Practices for Search UI in Dark Mode</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">A comprehensive guide on designing accessible and visually appealing search interfaces for modern dark-themed applications.</p>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Oct 11, 2023</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">language</span> medium.com</span>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">Open Link <span class="material-symbols-outlined text-xs">open_in_new</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Result Card 3 (Document/Note) -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+<div class="flex flex-col md:flex-row">
+<div class="md:w-64 h-40 flex-shrink-0 bg-primary/5 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-5xl">description</span>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-orange-500 text-sm">edit_note</span>
+<span class="text-xs font-medium text-slate-500 uppercase">Note • Notion</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Design Team Meeting Notes - Sept 28</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">Quick recap of the brainstorming session. Focus on "Timeline Search" functionality and sidebar navigation patterns.</p>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Sept 28, 2023</span>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">Read Note <span class="material-symbols-outlined text-xs">arrow_forward</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Result Card 4 (Video) -->
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
+<div class="flex flex-col md:flex-row">
+<div class="relative md:w-64 h-40 flex-shrink-0">
+<div class="w-full h-full bg-slate-200 dark:bg-slate-800 bg-cover bg-center" data-alt="Abstract tech background with glowing lines" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC4qYt70RT0B2u1PYunk_8RYjs6p_MxJkv8XOELqgZbfN_XmahF3qqFyYWmzG_zKGqT3Qmno-TJzy9MPKd-0EoA_fbX-qXmeuqny6WI07OsV5shRtwXDdtTPy72OIbteNdYeOT_-D7gyvllnYSORELCzIvoTr3IdklQqY29-FwL7EV_DUz2OWo8o7Rq5dNbDMFncZYI28UYq66Csd7SGl1qY55mCKcFCD0C7BDMCumEsNP-aV3D_8SszB-tshrSVVsjtL37HBE8CKKu')"></div>
+<div class="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-4xl">play_circle</span>
+</div>
+<div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">15:00</div>
+</div>
+<div class="p-5 flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-blue-500 text-sm">videocam</span>
+<span class="text-xs font-medium text-slate-500 uppercase">Video • Loom</span>
+</div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Product Demo: TimeStream Search v1.0</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">A walkthrough of the initial search implementation. Showing how filters and full-text search work together seamlessly.</p>
+</div>
+<div class="mt-4 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs text-slate-500">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Sept 15, 2023</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 02:45 PM</span>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">View Details <span class="material-symbols-outlined text-xs">arrow_forward</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>
