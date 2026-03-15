@@ -16,6 +16,7 @@ const CONFIG = {
 };
 
 let lastUrl = location.href;
+let lastLoggedUrl = null;
 let trackingTimeout = null;
 
 /**
@@ -43,10 +44,13 @@ function init() {
 function handlePageChange() {
     if (trackingTimeout) clearTimeout(trackingTimeout);
 
-    // Delay to let page load
+    // If we've already logged this URL, don't log it again immediately
+    if (location.href === lastLoggedUrl) return;
+
+    // Delay to let page load (important for SPA titles)
     trackingTimeout = setTimeout(() => {
         detectActivity();
-    }, 2000);
+    }, 3000);
 }
 
 /**
@@ -126,6 +130,7 @@ function trackGitHub() {
  * Send activity to background script
  */
 function sendActivity(activity) {
+    lastLoggedUrl = location.href;
     chrome.runtime.sendMessage({
         type: 'NEW_ACTIVITY',
         activity: {
