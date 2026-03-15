@@ -40,25 +40,33 @@ The extension captures your browser activity and sends it to the desktop app.
 
 ---
 
-## 3. CI/CD Pipeline Setup (GitHub Actions)
-We use GitHub Actions to automate testing and releases.
+## 3. CI/CD Pipeline (GitHub Actions)
+We use GitHub Actions to automate testing and releases directly on GitHub.
 
-### Running Actions Locally (for testing)
-We use a tool called `act` to run workflows on your local machine.
+### How to Monitor Actions
+1.  **Push Changes**: Every time you push code or open a Pull Request, GitHub automatically starts a workflow.
+2.  **View Results**: 
+    - Go to your repository on GitHub.
+    - Click the **"Actions"** tab at the top.
+    - You will see the **"Continuous Integration"** workflow running.
+    - Click on a run to see the logs and download the **Extension ZIP bundle** from the "Artifacts" section.
 
-1.  **Prerequisite**: Ensure **Docker** is installed and running.
-2.  **Run the Pipeline**:
+### Automated Releases
+1.  When you are ready for a new version, create and push a tag:
     ```bash
-    sudo ./bin/act
+    git tag v1.0.0
+    git push --tags
     ```
-    *Note: This will validate your `manifest.json`, lint your code, and generate a `dist/timestream-extension.zip`.*
+2.  GitHub will trigger the **"Release Extension"** workflow, which automatically creates a new GitHub Release and attaches the extension bundle.
 
-### Workflow Files
--   `.github/workflows/ci.yml`: Runs on every push/PR to check code quality.
--   `.github/workflows/release.yml`: Runs when you create a version tag (e.g., `git tag v1.0.0`) to create a GitHub Release.
+### (Optional) Local Testing
+If you ever need to test workflows without pushing to GitHub, you can use the `act` tool provided in `./bin/act` (requires Docker).
+
+---
 
 ---
 
 ## 4. Troubleshooting
 -   **Extension not syncing**: Check the "Sync status" in the extension popup. Ensure the desktop app is running, as it acts as the data receiver.
 -   **Docker permissions**: If `act` fails with "permission denied", use `sudo` or add your user to the docker group: `sudo usermod -aG docker $USER`.
+-   **GitHub Actions "Lock file not found"**: Ensure `package-lock.json` is committed to the repository. If it's missing from GitHub, check that it's not being ignored in `.gitignore`. (This was previously an issue but has been fixed in the latest `.gitignore`).

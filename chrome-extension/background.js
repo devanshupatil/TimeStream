@@ -2,8 +2,7 @@
  * TimeStream Extension - Background Service Worker
  */
 
-// Import storage logic (In MV3 service worker, we use importScripts for non-module scripts)
-importScripts('utils/storage.js');
+import Storage from './utils/storage.js';
 
 const SYNC_ALARM = 'sync-activities';
 

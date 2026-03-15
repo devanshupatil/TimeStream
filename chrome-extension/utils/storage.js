@@ -56,6 +56,4 @@ const Storage = {
 };
 
 // Export for use in background and popup
-if (typeof module !== 'undefined') {
-    module.exports = Storage;
-}
+export default Storage;

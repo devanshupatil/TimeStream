@@ -1,6 +1,7 @@
 /**
  * TimeStream Extension - Popup Logic
  */
+import Storage from '../utils/storage.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const statCount = document.getElementById('stat-count');
