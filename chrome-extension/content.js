@@ -130,12 +130,14 @@ function trackGitHub() {
  * Send activity to background script
  */
 function sendActivity(activity) {
+    const browserName = navigator.userAgent.includes("Firefox") ? "Firefox" : "Chrome";
     lastLoggedUrl = location.href;
     chrome.runtime.sendMessage({
         type: 'NEW_ACTIVITY',
         activity: {
             id: crypto.randomUUID(),
             timestamp: new Date().toISOString(),
+            browser: browserName,
             ...activity
         }
     });
