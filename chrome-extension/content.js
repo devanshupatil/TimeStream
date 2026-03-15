@@ -79,14 +79,21 @@ function trackYouTube() {
     const channel = document.querySelector(CONFIG.YOUTUBE.channelSelector)?.innerText;
 
     if (title) {
+        const titleText = title.trim();
+
+        // Developer-centric categorization
+        const learningKeywords = ['tutorial', 'course', 'study', 'explained', 'programming', 'development', 'lesson', 'coding', 'how to', 'learn', 'guide', 'mcp'];
+        const isLearning = learningKeywords.some(keyword => titleText.toLowerCase().includes(keyword));
+
         sendActivity({
             source: 'youtube',
             sourceLabel: 'YouTube',
-            title: title.trim(),
+            title: titleText,
             url: location.href,
-            category: 'Learning',
+            category: isLearning ? 'Learning' : 'Other',
             metadata: {
-                channel: channel ? channel.trim() : 'Unknown'
+                channel: channel ? channel.trim() : 'Unknown',
+                intelligence: isLearning ? 'educational' : 'general'
             }
         });
     }
