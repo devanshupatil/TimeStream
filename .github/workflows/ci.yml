@@ -1,0 +1,43 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+      working-directory: .
+
+    - name: Lint and Validate
+      run: |
+        # Basic linting (assuming eslint is setup in main project)
+        # npm run lint
+        echo "Validating manifest.json..."
+        jq . chrome-extension/manifest.json
+
+    - name: Build Extension
+      run: |
+        # Package into ZIP
+        mkdir -p dist
+        zip -r dist/timestream-extension.zip chrome-extension/*
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: timestream-extension
+        path: dist/timestream-extension.zip

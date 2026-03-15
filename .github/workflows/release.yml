@@ -1,0 +1,31 @@
+# AUTOMATED RELEASE WORKFLOW
+# Runs on version tags (v1.0.0, v1.0.1, etc.)
+name: Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Extension
+      run: |
+        mkdir -p dist
+        zip -r dist/timestream-extension.zip chrome-extension/*
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/timestream-extension.zip
+        body_path: chrome-extension/README.md
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
