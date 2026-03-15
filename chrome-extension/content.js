@@ -18,6 +18,7 @@ const CONFIG = {
 let lastUrl = location.href;
 let lastLoggedUrl = null;
 let trackingTimeout = null;
+let youtubeWatchTimeout = null;
 
 /**
  * Initialize tracker
@@ -43,6 +44,7 @@ function init() {
  */
 function handlePageChange() {
     if (trackingTimeout) clearTimeout(trackingTimeout);
+    if (youtubeWatchTimeout) clearTimeout(youtubeWatchTimeout);
 
     // If we've already logged this URL, don't log it again immediately
     if (location.href === lastLoggedUrl) return;
@@ -60,7 +62,10 @@ function detectActivity() {
     const url = location.href;
 
     if (CONFIG.YOUTUBE.matches.test(url)) {
-        trackYouTube();
+        console.log('YouTube detected. Waiting 3 minutes before logging...');
+        youtubeWatchTimeout = setTimeout(() => {
+            trackYouTube();
+        }, 180000); // 3 minutes
     } else if (CONFIG.GITHUB.matches.test(url)) {
         trackGitHub();
     }
