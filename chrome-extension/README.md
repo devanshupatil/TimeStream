@@ -38,3 +38,10 @@ The extension is built with Manifest V3 and uses:
 We use GitHub Actions for:
 - **CI**: Runs on every push to validate manifest and package the extension.
 - **Release**: Automatically creates a GitHub Release with the bundled extension ZIP when a version tag (e.g., `v1.0.0`) is pushed.
+## Troubleshooting
+
+### Why aren't my activities showing up?
+1.  **Desktop App Not Running**: The extension sends data to `http://localhost:3000`. Ensure the TimeStream desktop app is open and running.
+2.  **API URL Mismatch**: Open the extension **Options** (via gear icon) and verify the API URL matches your desktop app setting.
+3.  **Sync Delay**: By default, the extension syncs every 5 minutes. You can trigger an immediate sync using the **"Sync Now"** button in the popup.
+4.  **Service Worker Stalled**: If you recently updated the code, go to `chrome://extensions/` and click the **Refresh** icon on the TimeStream card.
