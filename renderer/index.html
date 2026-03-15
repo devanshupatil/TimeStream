@@ -1232,15 +1232,61 @@
             applyMode(mode);
         }
 
-        // ── INIT ──────────────────────────────────────────────────
-        function setAccent(color, hover) {
-            document.documentElement.style.setProperty('--accent', color);
-            document.documentElement.style.setProperty('--accent-hover', hover);
+        // ── LIVE UPDATES (BACKEND BRIDGE) ─────────────────────────
+        if (window.electronAPI) {
+            // Load historical data on startup
+            window.electronAPI.onActivityReceived((activities) => {
+                console.log('Received Activities:', activities);
+                activities.forEach(a => {
+                    // Update shared data
+                    window.TSData.ACTIVITIES.unshift(a);
+
+                    // Update Timeline hour entry
+                    const date = new Date(a.time || a.timestamp);
+                    const hourStr = date.getHours() % 12 || 12;
+                    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+                    const targetHour = `${hourStr} ${ampm}`;
+
+                    const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
+                    if (entry) {
+                        entry.activities.unshift(a);
+                    }
+                });
+
+                // Refresh UI if on relevant page
+                const activePage = document.querySelector('.page.active, .page-flex.active')?.id.replace('page-', '');
+                if (activePage === 'dashboard') renderDashboard();
+                if (activePage === 'timeline') renderTimeline();
+            });
         }
-        const savedMode = localStorage.getItem('ts-mode') || 'dark';
-        setAccent('#2bd4bd', '#1fbba4');
-        applyMode(savedMode);
-        navigate('dashboard');
+
+        // ── INIT ──────────────────────────────────────────────────
+        async function init() {
+            setAccent('#2bd4bd', '#1fbba4');
+            const savedMode = localStorage.getItem('ts-mode') || 'dark';
+            applyMode(savedMode);
+
+            // Fetch historical data
+            if (window.electronAPI?.getHistoricalData) {
+                const history = await window.electronAPI.getHistoricalData();
+                if (history && history.length > 0) {
+                    window.TSData.ACTIVITIES.push(...history);
+                    // Re-fill timeline buckets from history
+                    history.forEach(a => {
+                        const date = new Date(a.time || a.timestamp);
+                        const hourStr = date.getHours() % 12 || 12;
+                        const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+                        const targetHour = `${hourStr} ${ampm}`;
+                        const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
+                        if (entry) entry.activities.push(a);
+                    });
+                }
+            }
+
+            navigate('dashboard');
+        }
+
+        init();
 
     </script>
 
