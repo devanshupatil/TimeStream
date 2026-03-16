@@ -63,7 +63,24 @@ async function processWriteQueue() {
 
     const { activities, resolve } = writeQueue.shift();
     try {
-        const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        let currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+
+        // De-duplicate: For each new activity, remove any existing entry for the same URL on the same day
+        activities.forEach(newAct => {
+            if (!newAct.timestamp) return;
+            const newDate = newAct.timestamp.split('T')[0];
+
+            currentData = currentData.filter(oldAct => {
+                const rawDate = oldAct.timestamp || oldAct.time;
+                if (!rawDate) return true;
+
+                const oldDate = rawDate.split('T')[0];
+                const isSameUrl = oldAct.url === newAct.url;
+                const isSameDay = oldDate === newDate;
+                return !(isSameUrl && isSameDay);
+            });
+        });
+
         const updatedData = [...activities, ...currentData].slice(0, 1000);
         fs.writeFileSync(DATA_FILE, JSON.stringify(updatedData, null, 2));
         resolve(true);

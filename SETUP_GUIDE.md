@@ -31,10 +31,17 @@ The extension captures your browser activity and sends it to the desktop app.
 4.  Click **Load unpacked**.
 5.  Select the folder: `/home/devanshu/TimeStream/chrome-extension/`.
 
+### Installation (Firefox)
+1.  Open **Firefox**.
+2.  Go to `about:debugging#/runtime/this-firefox`.
+3.  Click **Load Temporary Add-on...**.
+4.  Select the `manifest.json` file in: `/home/devanshu/TimeStream/firefox-extension/`.
+
 ### Configuration
-1.  Click the TimeStream icon in your Chrome toolbar.
+1.  Click the TimeStream icon in your browser toolbar.
 2.  Ensure **Tracking Active** is enabled.
 3.  **Permissions**: The extension will automatically start tracking once you visit:
+4.  **Note**: In Firefox, you may need to grant host permissions manually if prompted.
     -   `youtube.com` (Detects video titles and channel names)
     -   `github.com` (Detects repo names, commits, PRs, and issues)
 

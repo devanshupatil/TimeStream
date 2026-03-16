@@ -396,6 +396,16 @@
             font-size: 20px;
             line-height: 1
         }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -486,7 +496,7 @@
                         <span class="material-symbols-outlined" style="font-size:16px">calendar_today</span>
                         <span id="dashboard-date">Today</span>
                     </button>
-                    <button
+                    <button id="btn-sync-dashboard"
                         style="display:flex;align-items:center;gap:8px;padding:8px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(43, 212, 189, 0.3)">
                         <span class="material-symbols-outlined" style="font-size:16px">sync</span>Sync Now
                     </button>
@@ -1262,8 +1272,38 @@
                 activities.forEach(a => {
                     // Normalize: Ensure .time exists
                     if (!a.time && a.timestamp) a.time = a.timestamp;
+                    if (!a.time) return;
 
-                    // Update shared data
+                    const dateObj = new Date(a.time);
+                    if (isNaN(dateObj.getTime())) return;
+                    const newDate = dateObj.toISOString().split('T')[0];
+
+                    // De-duplicate in shared data
+                    const oldIndex = window.TSData.ACTIVITIES.findIndex(old => {
+                        const oldTime = old.time || old.timestamp;
+                        if (!oldTime) return false;
+                        const oldDateObj = new Date(oldTime);
+                        if (isNaN(oldDateObj.getTime())) return false;
+                        const oldDate = oldDateObj.toISOString().split('T')[0];
+                        return old.url === a.url && oldDate === newDate;
+                    });
+
+                    if (oldIndex !== -1) {
+                        const oldAct = window.TSData.ACTIVITIES[oldIndex];
+                        window.TSData.ACTIVITIES.splice(oldIndex, 1);
+
+                        // Also remove from timeline buckets
+                        const oldDateObj = new Date(oldAct.time);
+                        const oldHourStr = oldDateObj.getHours() % 12 || 12;
+                        const oldAmpm = oldDateObj.getHours() >= 12 ? 'PM' : 'AM';
+                        const oldTargetHour = `${oldHourStr} ${oldAmpm}`;
+                        const oldEntry = window.TSData.getTimelineEntries().find(e => e.hour === oldTargetHour);
+                        if (oldEntry) {
+                            oldEntry.activities = oldEntry.activities.filter(act => act !== oldAct);
+                        }
+                    }
+
+                    // Prepend new activity
                     window.TSData.ACTIVITIES.unshift(a);
 
                     // Update Timeline hour entry
@@ -1319,6 +1359,56 @@
 
             navigate('dashboard');
         }
+
+        // ── SYNC LOGIC ──────────────────────────────────────────
+        async function refreshData() {
+            if (!window.electronAPI?.getHistoricalData) return;
+
+            const btn = document.getElementById('btn-sync-dashboard');
+            const icon = btn?.querySelector('.material-symbols-outlined');
+            if (icon) icon.style.animation = 'spin 1s linear infinite';
+            if (btn) btn.disabled = true;
+
+            try {
+                const history = await window.electronAPI.getHistoricalData();
+
+                // Clear current data
+                window.TSData.ACTIVITIES.length = 0;
+                window.TSData.getTimelineEntries().forEach(e => e.activities = []);
+
+                if (history && history.length > 0) {
+                    history.forEach(a => {
+                        if (!a.time && a.timestamp) a.time = a.timestamp;
+                    });
+                    window.TSData.ACTIVITIES.push(...history);
+
+                    // Re-bucket history for timeline
+                    history.forEach(a => {
+                        const date = new Date(a.time);
+                        if (!isNaN(date.getTime())) {
+                            const hourStr = date.getHours() % 12 || 12;
+                            const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+                            const targetHour = `${hourStr} ${ampm}`;
+                            const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
+                            if (entry) entry.activities.push(a);
+                        }
+                    });
+                }
+
+                // Refresh the current view
+                const activePage = document.querySelector('.page.active, .page-flex.active')?.id.replace('page-', '');
+                if (activePage === 'dashboard') renderDashboard();
+                if (activePage === 'timeline') renderTimeline();
+
+            } catch (err) {
+                console.error('Sync failed:', err);
+            } finally {
+                if (icon) icon.style.animation = '';
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        document.getElementById('btn-sync-dashboard').addEventListener('click', refreshData);
 
         init();
 

@@ -27,17 +27,22 @@ jobs:
       run: |
         # Basic linting (assuming eslint is setup in main project)
         # npm run lint
-        echo "Validating manifest.json..."
+        echo "Validating Chrome manifest.json..."
         jq . chrome-extension/manifest.json
+        echo "Validating Firefox manifest.json..."
+        jq . firefox-extension/manifest.json
 
-    - name: Build Extension
+    - name: Build Extensions
       run: |
         # Package into ZIP
         mkdir -p dist
         zip -r dist/timestream-extension.zip chrome-extension/*
+        zip -r dist/timestream-firefox-extension.zip firefox-extension/*
 
-    - name: Upload Artifact
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: timestream-extension
-        path: dist/timestream-extension.zip
+        name: timestream-extensions
+        path: |
+          dist/timestream-extension.zip
+          dist/timestream-firefox-extension.zip
