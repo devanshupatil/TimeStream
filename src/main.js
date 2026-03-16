@@ -46,6 +46,36 @@ function createWindow() {
     });
 }
 
+// ── DATA PERSISTENCE HELPERS ────────────────────────────────
+let isWriting = false;
+const writeQueue = [];
+
+async function saveActivities(activities) {
+    return new Promise((resolve) => {
+        writeQueue.push({ activities, resolve });
+        processWriteQueue();
+    });
+}
+
+async function processWriteQueue() {
+    if (isWriting || writeQueue.length === 0) return;
+    isWriting = true;
+
+    const { activities, resolve } = writeQueue.shift();
+    try {
+        const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+        const updatedData = [...activities, ...currentData].slice(0, 1000);
+        fs.writeFileSync(DATA_FILE, JSON.stringify(updatedData, null, 2));
+        resolve(true);
+    } catch (err) {
+        console.error('Persistence error:', err);
+        resolve(false);
+    } finally {
+        isWriting = false;
+        processWriteQueue();
+    }
+}
+
 // ── HTTP SERVER (DATA RECEIVER) ─────────────────────────────
 const server = http.createServer((req, res) => {
     // Enable CORS for Chrome Extension
@@ -59,26 +89,55 @@ const server = http.createServer((req, res) => {
         return;
     }
 
+    // GET endpoint for debugging/renderer
+    if (req.method === 'GET' && req.url === '/api/activity') {
+        try {
+            const data = fs.readFileSync(DATA_FILE, 'utf8');
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(data);
+        } catch (err) {
+            res.writeHead(500);
+            res.end(JSON.stringify({ success: false, error: 'Read error' }));
+        }
+        return;
+    }
+
     if (req.method === 'POST' && req.url === '/api/activity') {
         let body = '';
         req.on('data', chunk => { body += chunk.toString(); });
-        req.on('end', () => {
+        req.on('end', async () => {
             try {
                 const data = JSON.parse(body);
-                const activities = Array.isArray(data.activities) ? data.activities : [data];
+                let activities = [];
 
-                // Persist to local file
-                const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-                const updatedData = [...activities, ...currentData].slice(0, 1000); // Keep last 1000
-                fs.writeFileSync(DATA_FILE, JSON.stringify(updatedData, null, 2));
+                if (Array.isArray(data.activities)) {
+                    activities = data.activities;
+                } else if (data.source) { // Single activity object
+                    activities = [data];
+                }
+
+                if (activities.length === 0) {
+                    res.writeHead(400, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ success: false, error: 'No activities provided' }));
+                    return;
+                }
+
+                // Add missing timestamps
+                activities = activities.map(a => ({
+                    ...a,
+                    timestamp: a.timestamp || new Date().toISOString()
+                }));
+
+                // Persist with synchronization
+                const success = await saveActivities(activities);
 
                 // Send to Renderer
                 if (mainWindow) {
                     mainWindow.webContents.send('activity-received', activities);
                 }
 
-                res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ success: true, count: activities.length }));
+                res.writeHead(success ? 200 : 500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success, count: activities.length }));
             } catch (err) {
                 res.writeHead(400, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ success: false, error: 'Invalid JSON' }));
