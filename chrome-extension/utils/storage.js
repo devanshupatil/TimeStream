@@ -33,7 +33,16 @@ const Storage = {
     },
 
     async getStats() {
-        return (await this.get('stats')) || { dailyCount: 0, lastSync: null };
+        const stats = (await this.get('stats')) || { dailyCount: 0, lastSync: null, lastDate: null };
+        const today = new Date().toDateString();
+
+        if (stats.lastDate !== today) {
+            stats.dailyCount = 0;
+            stats.lastDate = today;
+            await this.set('stats', stats);
+        }
+
+        return stats;
     },
 
     async updateStats() {
