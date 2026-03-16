@@ -22,7 +22,11 @@ const TIMELINE_ENTRIES = [
 ];
 
 function getTodayActivities() {
-    return ACTIVITIES.slice().sort((a, b) => b.time - a.time);
+    return ACTIVITIES.slice().sort((a, b) => {
+        const timeA = new Date(a.time || a.timestamp || 0);
+        const timeB = new Date(b.time || b.timestamp || 0);
+        return timeB - timeA;
+    });
 }
 
 function getTimelineEntries() {
