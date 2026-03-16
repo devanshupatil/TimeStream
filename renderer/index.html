@@ -185,6 +185,7 @@
             gap: 20px;
             transition: all .15s;
             box-shadow: var(--shadow-sm);
+            cursor: pointer;
         }
 
         .activity-card:hover {
@@ -232,6 +233,11 @@
         .badge-devops {
             background: rgba(16, 185, 129, .15);
             color: #10b981;
+        }
+
+        .badge-other {
+            background: rgba(100, 116, 139, .15);
+            color: #64748b;
         }
 
 
@@ -1094,13 +1100,25 @@
 
         // ── HELPERS ───────────────────────────────────────────────
         function fmtTime(d) {
-            const dt = new Date(d); let h = dt.getHours();
+            const dt = new Date(d);
+            if (isNaN(dt.getTime())) return '—';
+            let h = dt.getHours();
             const m = String(dt.getMinutes()).padStart(2, '0'), ap = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12; return `${h}:${m} ${ap}`;
         }
+        function openLink(url) {
+            if (url && window.electronAPI?.openExternal) {
+                window.electronAPI.openExternal(url);
+            }
+        }
         function badgeHTML(cat) {
-            const map = { Coding: 'badge-coding', Learning: 'badge-learning', Research: 'badge-research', DevOps: 'badge-devops' };
-            return `<span class="badge ${map[cat] || 'badge-research'}">${cat}</span>`;
+            const map = { Coding: 'badge-coding', Learning: 'badge-learning', Research: 'badge-research', DevOps: 'badge-devops', Other: 'badge-other' };
+            return `<span class="badge ${map[cat] || 'badge-other'}">${cat}</span>`;
+        }
+        function browserBadgeHTML(browser) {
+            if (!browser) return '';
+            const color = browser === 'Firefox' ? 'background:rgba(255,145,0,0.15);color:#ff9100' : 'background:rgba(66,133,244,0.15);color:#4285f4';
+            return `<span class="badge" style="${color};margin-left:6px">${browser}</span>`;
         }
 
         // ── DASHBOARD ─────────────────────────────────────────────
@@ -1114,12 +1132,12 @@
             const feed = document.getElementById('activity-feed');
             const acts = window.TSData.getTodayActivities().slice(0, 6);
             feed.innerHTML = acts.map(a => `
-    <div class="activity-card">
+    <div class="activity-card" onclick="openLink('${a.url}')">
       <div class="icon-circle" style="background:${iconBg(a.source)};border:2px solid var(--bg)">${iconSVG(a.source)}</div>
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
           <h4 style="font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0.01em">${a.title}</h4>
-          ${badgeHTML(a.category)}
+          <div style="display:flex;align-items:center">${badgeHTML(a.category)}${browserBadgeHTML(a.browser)}</div>
         </div>
         <div style="display:flex;gap:16px">
           <span style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>${fmtTime(a.time)}</span>
@@ -1158,12 +1176,13 @@
         <div style="width:32px;height:32px;border-radius:8px;background:rgba(100,116,139,.1);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="color:var(--text-secondary)">coffee</span></div>
         <div><p style="font-size:13px;font-weight:600;font-style:italic;color:var(--text-secondary)">No recorded activity</p><p style="font-size:11px;color:var(--text-secondary)">${e.hour}</p></div>
       </div></div>` :
-                    acts.map(a => `<div class="tl-card">
+                    acts.map(a => `<div class="tl-card" onclick="openLink('${a.url}')">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
             <div style="width:32px;height:32px;border-radius:8px;background:${iconBg(a.source)};display:flex;align-items:center;justify-content:center">${iconSVG(a.source)}</div>
             <div><p style="font-size:13px;font-weight:700;color:var(--text-primary)">${a.title}</p><p style="font-size:11px;color:var(--text-secondary)">${a.sourceLabel} • ${fmtTime(a.time)}</p></div>
-          </div>${badgeHTML(a.category)}
+          </div>
+          <div style="display:flex;align-items:center">${badgeHTML(a.category)}${browserBadgeHTML(a.browser)}</div>
         </div>${a.tags ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${a.tags.map(t => `<span style="font-size:10px;padding:2px 8px;border-radius:9999px;border:1px solid var(--border);color:var(--text-secondary)">${t}</span>`).join('')}</div>` : ''}</div>`).join('');
                 return `<div style="display:flex;gap:32px;margin-bottom:40px;position:relative">
       <div style="width:64px;padding-top:4px;text-align:right;flex-shrink:0"><span style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase">${e.hour}</span></div>
@@ -1179,12 +1198,15 @@
             const res = window.TSData.search(q);
             document.getElementById('search-count').textContent = q ? `Results for "${q}"(${res.length})` : `All results(${res.length})`;
             document.getElementById('search-results').innerHTML = res.map(a => `
-    <div class="search-card">
+    <div class="search-card" onclick="openLink('${a.url}')">
       <div style="display:flex">
         <div style="width:200px;flex-shrink:0;background:${iconBg(a.source)};display:flex;align-items:center;justify-content:center;min-height:120px">${iconSVG(a.source, 40)}</div>
         <div style="padding:16px;flex:1;display:flex;flex-direction:column;justify-content:space-between">
           <div>
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:700;letter-spacing:0.05em">${a.category} · ${a.sourceLabel}</span></div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <span style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;font-weight:700;letter-spacing:0.05em">${a.category} · ${a.sourceLabel}</span>
+                ${browserBadgeHTML(a.browser)}
+            </div>
             <h3 style="font-size:15px;font-weight:700;color:var(--text-primary)">${a.title}</h3>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
@@ -1238,18 +1260,23 @@
             window.electronAPI.onActivityReceived((activities) => {
                 console.log('Received Activities:', activities);
                 activities.forEach(a => {
+                    // Normalize: Ensure .time exists
+                    if (!a.time && a.timestamp) a.time = a.timestamp;
+
                     // Update shared data
                     window.TSData.ACTIVITIES.unshift(a);
 
                     // Update Timeline hour entry
-                    const date = new Date(a.time || a.timestamp);
-                    const hourStr = date.getHours() % 12 || 12;
-                    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-                    const targetHour = `${hourStr} ${ampm}`;
+                    const date = new Date(a.time);
+                    if (!isNaN(date.getTime())) {
+                        const hourStr = date.getHours() % 12 || 12;
+                        const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+                        const targetHour = `${hourStr} ${ampm}`;
 
-                    const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
-                    if (entry) {
-                        entry.activities.unshift(a);
+                        const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
+                        if (entry) {
+                            entry.activities.unshift(a);
+                        }
                     }
                 });
 
@@ -1270,15 +1297,22 @@
             if (window.electronAPI?.getHistoricalData) {
                 const history = await window.electronAPI.getHistoricalData();
                 if (history && history.length > 0) {
+                    history.forEach(a => {
+                        // Normalize: Ensure .time exists
+                        if (!a.time && a.timestamp) a.time = a.timestamp;
+                    });
+
                     window.TSData.ACTIVITIES.push(...history);
                     // Re-fill timeline buckets from history
                     history.forEach(a => {
-                        const date = new Date(a.time || a.timestamp);
-                        const hourStr = date.getHours() % 12 || 12;
-                        const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-                        const targetHour = `${hourStr} ${ampm}`;
-                        const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
-                        if (entry) entry.activities.push(a);
+                        const date = new Date(a.time);
+                        if (!isNaN(date.getTime())) {
+                            const hourStr = date.getHours() % 12 || 12;
+                            const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+                            const targetHour = `${hourStr} ${ampm}`;
+                            const entry = window.TSData.getTimelineEntries().find(e => e.hour === targetHour);
+                            if (entry) entry.activities.push(a);
+                        }
                     });
                 }
             }
