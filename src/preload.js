@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     openExternal: (url) => ipcRenderer.send('open-external', url),
     getHistoricalData: () => ipcRenderer.invoke('get-historical-data'),
     onActivityReceived: (callback) => ipcRenderer.on('activity-received', (_, data) => callback(data)),
+    clearHistory: () => ipcRenderer.invoke('clear-history'),
     platform: process.platform,
 });

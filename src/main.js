@@ -67,14 +67,15 @@ async function processWriteQueue() {
 
         // De-duplicate: For each new activity, remove any existing entry for the same URL on the same day
         activities.forEach(newAct => {
-            if (!newAct.timestamp) return;
-            const newDate = newAct.timestamp.split('T')[0];
+            const newRawDate = newAct.timestamp || newAct.time;
+            if (!newRawDate) return;
+            const newDate = new Date(newRawDate).toISOString().split('T')[0];
 
             currentData = currentData.filter(oldAct => {
-                const rawDate = oldAct.timestamp || oldAct.time;
-                if (!rawDate) return true;
+                const oldRawDate = oldAct.timestamp || oldAct.time;
+                if (!oldRawDate) return true;
 
-                const oldDate = rawDate.split('T')[0];
+                const oldDate = new Date(oldRawDate).toISOString().split('T')[0];
                 const isSameUrl = oldAct.url === newAct.url;
                 const isSameDay = oldDate === newDate;
                 return !(isSameUrl && isSameDay);
@@ -201,6 +202,17 @@ ipcMain.handle('get-historical-data', () => {
 // Open external links in default browser
 ipcMain.on('open-external', (_, url) => {
     shell.openExternal(url);
+});
+
+// Clear historical data
+ipcMain.handle('clear-history', () => {
+    try {
+        fs.writeFileSync(DATA_FILE, JSON.stringify([]));
+        return { success: true };
+    } catch (err) {
+        console.error('Clear history error:', err);
+        return { success: false, error: err.message };
+    }
 });
 
 app.whenReady().then(() => {

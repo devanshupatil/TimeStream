@@ -49,11 +49,18 @@ async function handleNewActivity(activity) {
     if (activity.source === 'github' && !settings.trackGitHub) return;
     if (activity.source === 'youtube' && !settings.trackYouTube) return;
 
+    // De-duplication check for today
+    const isLogged = await Storage.isUrlLoggedToday(activity.url);
+    if (isLogged) {
+        console.log('Activity already logged today, skipping:', activity.url);
+        return;
+    }
+
     console.log('Logging Activity:', activity);
 
-    // Add to queue and update local stats
+    // Add to queue and update local stats (which now handles URL recording)
     await Storage.addToQueue(activity);
-    await Storage.updateStats();
+    await Storage.updateStats(activity.url);
 
     // Broadcast to popup if open
     chrome.runtime.sendMessage({ type: 'STATS_UPDATED' }).catch(() => { });

@@ -33,22 +33,44 @@ const Storage = {
     },
 
     async getStats() {
-        const stats = (await this.get('stats')) || { dailyCount: 0, lastSync: null, lastDate: null };
+        const stats = (await this.get('stats')) || { dailyCount: 0, lastSync: null, lastDate: null, loggedUrls: [] };
         const today = new Date().toDateString();
 
         if (stats.lastDate !== today) {
             stats.dailyCount = 0;
             stats.lastDate = today;
+            stats.loggedUrls = []; // Reset logged URLs for the new day
             await this.set('stats', stats);
         }
 
         return stats;
     },
 
-    async updateStats() {
+    async isUrlLoggedToday(url) {
         const stats = await this.getStats();
-        stats.dailyCount += 1;
-        await this.set('stats', stats);
+        return (stats.loggedUrls || []).includes(url);
+    },
+
+    async updateStats(url) {
+        const stats = await this.getStats();
+
+        // Only update if URL hasn't been logged today
+        if (url && !(stats.loggedUrls || []).includes(url)) {
+            stats.dailyCount += 1;
+            stats.loggedUrls = stats.loggedUrls || [];
+            stats.loggedUrls.push(url);
+            await this.set('stats', stats);
+            return true;
+        }
+
+        // If no URL provided (direct increment), still increment but we shouldn't really use this much now
+        if (!url) {
+            stats.dailyCount += 1;
+            await this.set('stats', stats);
+            return true;
+        }
+
+        return false;
     },
 
     async getSettings() {

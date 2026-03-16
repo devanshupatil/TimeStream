@@ -1055,7 +1055,7 @@
                     style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer">
                     <span class="material-symbols-outlined"
                         style="font-size:16px;color:var(--text-secondary)">cloud_upload</span>Manual Backup</button>
-                <button
+                <button id="btn-clear-history-app"
                     style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid rgba(239,68,68,.3);border-radius:10px;background:transparent;color:#f87171;font-size:13px;font-weight:600;cursor:pointer;margin-left:auto">
                     <span class="material-symbols-outlined" style="font-size:16px">delete_forever</span>Clear
                     History</button>
@@ -1409,6 +1409,43 @@
         }
 
         document.getElementById('btn-sync-dashboard').addEventListener('click', refreshData);
+
+        // ── CLEAR HISTORY (APP) ─────────────────────────────────
+        async function clearAppHistory() {
+            if (!window.electronAPI?.clearHistory) return;
+
+            const confirmed = confirm('Are you sure you want to delete ALL activity history? This action cannot be undone.');
+            if (!confirmed) return;
+
+            const btn = document.getElementById('btn-clear-history-app');
+            if (btn) btn.disabled = true;
+
+            try {
+                const result = await window.electronAPI.clearHistory();
+                if (result.success) {
+                    // Clear local state
+                    window.TSData.ACTIVITIES.length = 0;
+                    window.TSData.getTimelineEntries().forEach(e => e.activities = []);
+
+                    // Refresh UI
+                    const activePage = document.querySelector('.page.active, .page-flex.active')?.id.replace('page-', '');
+                    if (activePage === 'dashboard') renderDashboard();
+                    if (activePage === 'timeline') renderTimeline();
+                    if (activePage === 'search') renderSearch('');
+
+                    alert('History cleared successfully.');
+                } else {
+                    alert('Failed to clear history: ' + result.error);
+                }
+            } catch (err) {
+                console.error('Clear history error:', err);
+                alert('An error occurred while clearing history.');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        document.getElementById('btn-clear-history-app')?.addEventListener('click', clearAppHistory);
 
         init();
 

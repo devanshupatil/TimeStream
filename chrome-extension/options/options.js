@@ -45,4 +45,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
     });
+
+    // Clean History
+    const cleanHistoryBtn = document.getElementById('btn-clean-history');
+    if (cleanHistoryBtn) {
+        cleanHistoryBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you want to clear all history and statistics? This cannot be undone.')) {
+                await Storage.clearQueue();
+                await Storage.set('stats', {
+                    dailyCount: 0,
+                    lastSync: null,
+                    lastDate: new Date().toDateString()
+                });
+                alert('History cleared successfully!');
+                chrome.runtime.sendMessage({ type: 'STATS_UPDATED' });
+            }
+        });
+    }
 });
