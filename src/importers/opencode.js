@@ -31,6 +31,7 @@ function extractErrors(messages) {
   for (let i = 0; i < messages.length; i++) {
     const msg = messages[i];
     if (msg.role !== 'user') continue;
+    if (typeof msg.content !== 'string') continue;  // guard
     const matched = ERROR_PATTERNS.find(p => p.test(msg.content));
     if (!matched) continue;
     const nextIsAssistant = messages[i + 1] && messages[i + 1].role === 'assistant';
@@ -39,13 +40,18 @@ function extractErrors(messages) {
   return errors;
 }
 
-function extractTags(errors, filesChanged) {
+function extractTags(errors, filesChanged, messages) {
   const tags = new Set();
+  // From file extensions
   filesChanged.forEach(f => {
     const ext = path.extname(f).toLowerCase();
     if (EXTENSION_TO_TAG[ext]) tags.add(EXTENSION_TO_TAG[ext]);
   });
-  const allText = errors.map(e => e.message).join(' ');
+  // From error messages + all message content
+  const allText = [
+    ...errors.map(e => e.message),
+    ...(messages || []).map(m => (typeof m.content === 'string' ? m.content : ''))
+  ].join(' ');
   KEYWORD_TAGS.forEach(({ pattern, tag }) => {
     if (pattern.test(allText)) tags.add(tag);
   });
@@ -53,13 +59,15 @@ function extractTags(errors, filesChanged) {
 }
 
 function extractFiles(messages) {
-  const FILE_RE = /(?:^|\s)([\w./\\-]+\.\w{1,5})/g;
   const found = new Set();
   messages.forEach(msg => {
+    if (typeof msg.content !== 'string') return;
+    const FILE_RE = /(?:^|\s)([\w./\\-]+\.[a-zA-Z]{1,5})/g;
     let m;
     while ((m = FILE_RE.exec(msg.content)) !== null) {
       const f = m[1].trim();
-      if (f.length > 3) found.add(f);
+      // Filter out version strings and short tokens
+      if (f.length > 4 && /\//.test(f)) found.add(f);
     }
   });
   return [...found];
@@ -80,12 +88,12 @@ function extractSession(raw, filePath, fileMtime) {
 
   const assistantMsgs = messages.filter(m => m.role === 'assistant');
   const summary = assistantMsgs.length > 0
-    ? assistantMsgs[assistantMsgs.length - 1].content
-    : (messages[0] ? messages[0].content : '');
+    ? assistantMsgs[assistantMsgs.length - 1].content.slice(0, 500)
+    : (messages[0] ? (messages[0].content || '').slice(0, 500) : '');
 
   const errors = extractErrors(messages);
   const filesChanged = extractFiles(messages);
-  const tags = extractTags(errors, filesChanged);
+  const tags = extractTags(errors, filesChanged, messages);
 
   return {
     sessionId: raw.id || path.basename(filePath, '.json'),

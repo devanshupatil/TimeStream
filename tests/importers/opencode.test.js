@@ -113,6 +113,36 @@ describe('extractFiles', () => {
   });
 });
 
+describe('extractErrors - edge cases', () => {
+  it('skips messages with non-string content', () => {
+    const msgs = [
+      { role: 'user', content: null },
+      { role: 'user', content: undefined },
+      { role: 'user', content: 42 },
+    ];
+    assert.deepEqual(extractErrors(msgs), []);
+  });
+});
+
+describe('extractFiles - edge cases', () => {
+  it('handles messages with non-string content', () => {
+    const msgs = [{ role: 'user', content: null }];
+    assert.deepEqual(extractFiles(msgs), []);
+  });
+
+  it('does not return bare version strings without path separator', () => {
+    const msgs = [{ role: 'user', content: 'version 1.0 and v2.3 are out' }];
+    const files = extractFiles(msgs);
+    assert.ok(!files.some(f => f === '1.0' || f === 'v2.3'));
+  });
+
+  it('finds path with directory separator', () => {
+    const msgs = [{ role: 'user', content: 'Error in src/server.js line 10' }];
+    const files = extractFiles(msgs);
+    assert.ok(files.includes('src/server.js'));
+  });
+});
+
 describe('loadSessions', () => {
   it('returns empty array when file does not exist', () => {
     const result = loadSessions('/nonexistent/path.json');
