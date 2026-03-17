@@ -42,20 +42,29 @@ function startWatcher({ storageFile, onSession, onMissingDir }) {
     return null;
   }
 
-  const handleFile = debounce(async (filePath) => {
+  const debounceMap = new Map();
+
+  async function processFile(filePath) {
     if (!filePath.endsWith('.json')) return;
     try {
       const raw = await parseWithRetry(
-        () => Promise.resolve(fs.readFileSync(filePath, 'utf8'))
+        () => fs.promises.readFile(filePath, 'utf8')
       );
-      const mtime = fs.statSync(filePath).mtimeMs;
+      const mtime = (await fs.promises.stat(filePath)).mtimeMs;
       const session = extractSession(raw, filePath, mtime);
       const saved = saveSession(session, storageFile);
       if (saved && onSession) onSession(session);
     } catch (err) {
       console.warn(`[FileWatcher] Skipping ${path.basename(filePath)}: ${err.message}`);
     }
-  }, DEBOUNCE_MS);
+  }
+
+  function getHandler(filePath) {
+    if (!debounceMap.has(filePath)) {
+      debounceMap.set(filePath, debounce(processFile, DEBOUNCE_MS));
+    }
+    return debounceMap.get(filePath);
+  }
 
   const watcher = chokidar.watch(OPENCODE_SESSIONS_DIR, {
     ignoreInitial: false,
@@ -63,9 +72,10 @@ function startWatcher({ storageFile, onSession, onMissingDir }) {
     awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
   });
 
-  watcher.on('add', handleFile);
-  watcher.on('change', handleFile);
-  watcher.on('error', err => console.error('[FileWatcher] Error:', err));
+  watcher.on('add',    fp => getHandler(fp)(fp));
+  watcher.on('change', fp => getHandler(fp)(fp));
+  watcher.on('unlink', fp => debounceMap.delete(fp));  // cleanup
+  watcher.on('error',  err => console.error('[FileWatcher] Error:', err));
 
   return watcher;
 }
