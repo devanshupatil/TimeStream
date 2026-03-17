@@ -65,10 +65,26 @@ async function processWriteQueue() {
     try {
         let currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 
-        // De-duplicate: For each new activity, remove any existing entry for the same URL on the same day
-        activities.forEach(newAct => {
+        // 1. Sort incoming activities by time (latest first)
+        activities.sort((a, b) => new Date(b.timestamp || b.time) - new Date(a.timestamp || a.time));
+
+        // 2. De-duplicate batch against itself
+        const uniqueIncoming = [];
+        const seenInBatch = new Set();
+        activities.forEach(act => {
+            const actDate = act.timestamp || act.time;
+            if (!actDate) return;
+            const date = new Date(actDate).toISOString().split('T')[0];
+            const key = (act.dedupKey || act.url) + '|' + date;
+            if (!seenInBatch.has(key)) {
+                uniqueIncoming.push(act);
+                seenInBatch.add(key);
+            }
+        });
+
+        // 3. Filter existing data against the unique incoming set
+        uniqueIncoming.forEach(newAct => {
             const newRawDate = newAct.timestamp || newAct.time;
-            if (!newRawDate) return;
             const newDate = new Date(newRawDate).toISOString().split('T')[0];
 
             currentData = currentData.filter(oldAct => {
@@ -76,13 +92,21 @@ async function processWriteQueue() {
                 if (!oldRawDate) return true;
 
                 const oldDate = new Date(oldRawDate).toISOString().split('T')[0];
-                const isSameUrl = oldAct.url === newAct.url;
                 const isSameDay = oldDate === newDate;
-                return !(isSameUrl && isSameDay);
+
+                // De-duplicate by dedupKey if available, otherwise by URL
+                let isSameActivity = false;
+                if (newAct.dedupKey && oldAct.dedupKey) {
+                    isSameActivity = oldAct.dedupKey === newAct.dedupKey;
+                } else {
+                    isSameActivity = oldAct.url === newAct.url;
+                }
+
+                return !(isSameActivity && isSameDay);
             });
         });
 
-        const updatedData = [...activities, ...currentData].slice(0, 1000);
+        const updatedData = [...uniqueIncoming, ...currentData].slice(0, 1000);
         fs.writeFileSync(DATA_FILE, JSON.stringify(updatedData, null, 2));
         resolve(true);
     } catch (err) {

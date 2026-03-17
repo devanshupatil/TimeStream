@@ -91,6 +91,7 @@ function trackYouTube() {
             title: titleText,
             url: location.href,
             category: isLearning ? 'Learning' : 'Other',
+            dedupKey: `youtube:${new URLSearchParams(window.location.search).get('v')}`, // De-duplicate by video
             metadata: {
                 channel: channel ? channel.trim() : 'Unknown',
                 intelligence: isLearning ? 'educational' : 'general'
@@ -131,6 +132,7 @@ function trackGitHub() {
         title: title,
         url: location.href,
         category: 'Coding',
+        dedupKey: `github:${owner}/${repo}`, // De-duplicate by repository
         metadata: {
             repo: `${owner}/${repo}`,
             type: type

@@ -50,17 +50,18 @@ async function handleNewActivity(activity) {
     if (activity.source === 'youtube' && !settings.trackYouTube) return;
 
     // De-duplication check for today
-    const isLogged = await Storage.isUrlLoggedToday(activity.url);
+    const dedupKey = activity.dedupKey || activity.url;
+    const isLogged = await Storage.isKeyLoggedToday(dedupKey);
     if (isLogged) {
-        console.log('Activity already logged today, skipping:', activity.url);
+        console.log('Activity already logged today, skipping:', dedupKey);
         return;
     }
 
     console.log('Logging Activity:', activity);
 
-    // Add to queue and update local stats (which now handles URL recording)
+    // Add to queue and update local stats (which now handles dedupKey recording)
     await Storage.addToQueue(activity);
-    await Storage.updateStats(activity.url);
+    await Storage.updateStats(dedupKey);
 
     // Broadcast to popup if open
     chrome.runtime.sendMessage({ type: 'STATS_UPDATED' }).catch(() => { });

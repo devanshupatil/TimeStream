@@ -33,38 +33,40 @@ const Storage = {
     },
 
     async getStats() {
-        const stats = (await this.get('stats')) || { dailyCount: 0, lastSync: null, lastDate: null, loggedUrls: [] };
+        const stats = (await this.get('stats')) || { dailyCount: 0, lastSync: null, lastDate: null, loggedKeys: [] };
         const today = new Date().toDateString();
 
         if (stats.lastDate !== today) {
             stats.dailyCount = 0;
             stats.lastDate = today;
-            stats.loggedUrls = []; // Reset logged URLs for the new day
+            stats.loggedKeys = []; // Reset logged keys for the new day
             await this.set('stats', stats);
         }
 
         return stats;
     },
 
-    async isUrlLoggedToday(url) {
+    async isKeyLoggedToday(key) {
+        if (!key) return false;
         const stats = await this.getStats();
-        return (stats.loggedUrls || []).includes(url);
+        return (stats.loggedKeys || []).includes(key);
     },
 
-    async updateStats(url) {
+    async updateStats(key) {
         const stats = await this.getStats();
+        const dedupKey = key;
 
-        // Only update if URL hasn't been logged today
-        if (url && !(stats.loggedUrls || []).includes(url)) {
+        // Only update if Key hasn't been logged today
+        if (dedupKey && !(stats.loggedKeys || []).includes(dedupKey)) {
             stats.dailyCount += 1;
-            stats.loggedUrls = stats.loggedUrls || [];
-            stats.loggedUrls.push(url);
+            stats.loggedKeys = stats.loggedKeys || [];
+            stats.loggedKeys.push(dedupKey);
             await this.set('stats', stats);
             return true;
         }
 
-        // If no URL provided (direct increment), still increment but we shouldn't really use this much now
-        if (!url) {
+        // If no key provided (direct increment)
+        if (!dedupKey) {
             stats.dailyCount += 1;
             await this.set('stats', stats);
             return true;
