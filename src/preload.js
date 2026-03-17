@@ -10,5 +10,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onActivityReceived: (callback) => ipcRenderer.on('activity-received', (_, data) => callback(data)),
     clearHistory: () => ipcRenderer.invoke('clear-history'),
     getLearningSeconds: (date) => ipcRenderer.invoke('get-learning-seconds', date),
+    getOpencodeSessions: (date) => ipcRenderer.invoke('get-opencode-sessions', date),
+    onOpenCodeSessionImported: (cb) => {
+        ipcRenderer.removeAllListeners('opencode-session-imported');
+        ipcRenderer.on('opencode-session-imported', (_, s) => cb(s));
+    },
+    onOpenCodeMissingDir: (cb) => {
+        ipcRenderer.removeAllListeners('opencode-missing-dir');
+        ipcRenderer.on('opencode-missing-dir', () => cb());
+    },
     platform: process.platform,
 });

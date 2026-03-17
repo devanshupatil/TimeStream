@@ -2,11 +2,13 @@ const { app, BrowserWindow, ipcMain, shell, screen } = require('electron');
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
+const { startWatcher } = require('./services/fileWatcher.js');
 
 let mainWindow;
 const PORT = 3000;
 const DATA_FILE = path.join(app.getPath('userData'), 'activities.json');
 const LEARNING_FILE = path.join(app.getPath('userData'), 'learning-seconds.json');
+const OPENCODE_FILE = path.join(app.getPath('userData'), 'opencode-sessions.json');
 
 // Ensure data files exist
 if (!fs.existsSync(DATA_FILE)) {
@@ -14,6 +16,9 @@ if (!fs.existsSync(DATA_FILE)) {
 }
 if (!fs.existsSync(LEARNING_FILE)) {
     fs.writeFileSync(LEARNING_FILE, JSON.stringify({}));
+}
+if (!fs.existsSync(OPENCODE_FILE)) {
+    fs.writeFileSync(OPENCODE_FILE, JSON.stringify([]));
 }
 
 function createWindow() {
@@ -271,8 +276,29 @@ ipcMain.handle('get-learning-seconds', (_, date) => {
     }
 });
 
+// Get OpenCode sessions, optionally filtered by date (YYYY-MM-DD)
+ipcMain.handle('get-opencode-sessions', (_, date) => {
+    try {
+        const sessions = JSON.parse(fs.readFileSync(OPENCODE_FILE, 'utf8'));
+        if (date) return sessions.filter(s => s.date === date);
+        return sessions;
+    } catch {
+        return [];
+    }
+});
+
 app.whenReady().then(() => {
     createWindow();
+
+    startWatcher({
+        storageFile: OPENCODE_FILE,
+        onSession: (session) => {
+            if (mainWindow) mainWindow.webContents.send('opencode-session-imported', session);
+        },
+        onMissingDir: () => {
+            if (mainWindow) mainWindow.webContents.send('opencode-missing-dir');
+        },
+    });
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
