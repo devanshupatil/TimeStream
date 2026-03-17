@@ -3,6 +3,6 @@
     "chokidar": "^5.0.0"
   },
   "scripts": {
-    "test": "find tests -name '*.test.js' -type f | xargs node --test 2>/dev/null || echo 'No tests found'"
+    "test": "node --test tests/"
   }
 }
