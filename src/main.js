@@ -6,10 +6,14 @@ const fs = require('fs');
 let mainWindow;
 const PORT = 3000;
 const DATA_FILE = path.join(app.getPath('userData'), 'activities.json');
+const LEARNING_FILE = path.join(app.getPath('userData'), 'learning-seconds.json');
 
-// Ensure data file exists
+// Ensure data files exist
 if (!fs.existsSync(DATA_FILE)) {
     fs.writeFileSync(DATA_FILE, JSON.stringify([]));
+}
+if (!fs.existsSync(LEARNING_FILE)) {
+    fs.writeFileSync(LEARNING_FILE, JSON.stringify({}));
 }
 
 function createWindow() {
@@ -158,24 +162,40 @@ const server = http.createServer((req, res) => {
                     activities = [data];
                 }
 
-                if (activities.length === 0) {
+                // Handle learning seconds if present
+                if (data.learningSeconds && typeof data.learningSeconds === 'object') {
+                    try {
+                        const lsData = JSON.parse(fs.readFileSync(LEARNING_FILE, 'utf8'));
+                        for (const [date, seconds] of Object.entries(data.learningSeconds)) {
+                            lsData[date] = Math.max(lsData[date] || 0, seconds);
+                        }
+                        fs.writeFileSync(LEARNING_FILE, JSON.stringify(lsData, null, 2));
+                    } catch (err) {
+                        console.error('Learning seconds persistence error:', err);
+                    }
+                }
+
+                if (activities.length === 0 && !data.learningSeconds) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: false, error: 'No activities provided' }));
+                    res.end(JSON.stringify({ success: false, error: 'No data provided' }));
                     return;
                 }
 
-                // Add missing timestamps
-                activities = activities.map(a => ({
-                    ...a,
-                    timestamp: a.timestamp || new Date().toISOString()
-                }));
+                let success = true;
+                if (activities.length > 0) {
+                    // Add missing timestamps
+                    activities = activities.map(a => ({
+                        ...a,
+                        timestamp: a.timestamp || new Date().toISOString()
+                    }));
 
-                // Persist with synchronization
-                const success = await saveActivities(activities);
+                    // Persist with synchronization
+                    success = await saveActivities(activities);
 
-                // Send to Renderer
-                if (mainWindow) {
-                    mainWindow.webContents.send('activity-received', activities);
+                    // Send to Renderer
+                    if (mainWindow) {
+                        mainWindow.webContents.send('activity-received', activities);
+                    }
                 }
 
                 res.writeHead(success ? 200 : 500, { 'Content-Type': 'application/json' });
@@ -232,10 +252,22 @@ ipcMain.on('open-external', (_, url) => {
 ipcMain.handle('clear-history', () => {
     try {
         fs.writeFileSync(DATA_FILE, JSON.stringify([]));
+        fs.writeFileSync(LEARNING_FILE, JSON.stringify({}));
         return { success: true };
     } catch (err) {
         console.error('Clear history error:', err);
         return { success: false, error: err.message };
+    }
+});
+
+// Get learning seconds for a specific date or all dates
+ipcMain.handle('get-learning-seconds', (_, date) => {
+    try {
+        const data = JSON.parse(fs.readFileSync(LEARNING_FILE, 'utf8'));
+        if (date) return data[date] || 0;
+        return data;
+    } catch (err) {
+        return date ? 0 : {};
     }
 });
 

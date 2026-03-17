@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getHistoricalData: () => ipcRenderer.invoke('get-historical-data'),
     onActivityReceived: (callback) => ipcRenderer.on('activity-received', (_, data) => callback(data)),
     clearHistory: () => ipcRenderer.invoke('clear-history'),
+    getLearningSeconds: (date) => ipcRenderer.invoke('get-learning-seconds', date),
     platform: process.platform,
 });
