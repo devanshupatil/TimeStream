@@ -66,8 +66,8 @@
     }
 
     // ---- Dashboard ----
-    function renderDashboard() {
-        const stats = window.TSData.getStats();
+    async function renderDashboard() {
+        const stats = await window.TSData.getStats();
         const el = id => document.getElementById(id);
 
         const todayEl = el('stat-today');

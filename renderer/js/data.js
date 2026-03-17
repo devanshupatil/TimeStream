@@ -33,10 +33,31 @@ function getTimelineEntries() {
     return TIMELINE_ENTRIES;
 }
 
-function getStats() {
+function formatLearningTime(totalSeconds) {
+    if (!totalSeconds || totalSeconds <= 0) return '0m';
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    if (hours === 0) return minutes + 'm';
+    if (minutes === 0) return hours + 'h';
+    return hours + 'h ' + minutes + 'm';
+}
+
+async function getStats(dateStr) {
+    let learningHours = '0m';
+    const targetDate = dateStr || new Date().toISOString().split('T')[0];
+
+    if (window.electronAPI?.getLearningSeconds) {
+        try {
+            const seconds = await window.electronAPI.getLearningSeconds(targetDate);
+            learningHours = formatLearningTime(seconds);
+        } catch (err) {
+            console.error('Failed to get learning seconds:', err);
+        }
+    }
+
     return {
         todayActivities: ACTIVITIES.length,
-        learningHours: '0h',
+        learningHours,
         streak: '0 Days',
     };
 }
