@@ -75,6 +75,18 @@ const Storage = {
         return false;
     },
 
+    async getLearningSeconds(dateStr) {
+        const key = 'learningSeconds_' + dateStr;
+        return (await this.get(key)) || 0;
+    },
+
+    async addLearningSeconds(seconds, dateStr) {
+        const key = 'learningSeconds_' + dateStr;
+        const current = (await this.get(key)) || 0;
+        await this.set(key, current + seconds);
+        return current + seconds;
+    },
+
     async getSettings() {
         const defaults = {
             trackingEnabled: true,

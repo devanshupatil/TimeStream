@@ -28,7 +28,12 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
 // Listener for messages from content scripts or popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'NEW_ACTIVITY') {
-        handleNewActivity(request.activity);
+        handleNewActivity(request.activity).then(() => sendResponse({ ok: true })).catch(() => sendResponse({ ok: false }));
+        return true;
+    }
+
+    if (request.type === 'HEARTBEAT') {
+        handleHeartbeat().then(() => sendResponse({ ok: true })).catch(() => sendResponse({ ok: false }));
         return true;
     }
 
@@ -68,25 +73,45 @@ async function handleNewActivity(activity) {
 }
 
 /**
+ * Handle heartbeat - accumulate learning seconds
+ */
+async function handleHeartbeat() {
+    const settings = await Storage.getSettings();
+    if (!settings.trackingEnabled) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    await Storage.addLearningSeconds(30, today);
+
+    chrome.runtime.sendMessage({ type: 'STATS_UPDATED' }).catch(() => { });
+}
+
+/**
  * Sync queued data to the backend
  */
 async function syncData() {
     const queue = await Storage.getQueue();
-    if (queue.length === 0) return { success: true, count: 0 };
+    const today = new Date().toISOString().split('T')[0];
+    const learningSeconds = await Storage.getLearningSeconds(today);
+
+    // Nothing to sync
+    if (queue.length === 0 && learningSeconds === 0) return { success: true, count: 0 };
 
     const settings = await Storage.getSettings();
 
     try {
-        console.log(`Syncing ${queue.length} activities to ${settings.apiUrl}...`);
+        console.log(`Syncing ${queue.length} activities + ${learningSeconds}s learning to ${settings.apiUrl}...`);
 
         const response = await fetch(settings.apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ activities: queue })
+            body: JSON.stringify({
+                activities: queue.length > 0 ? queue : undefined,
+                learningSeconds: { [today]: learningSeconds }
+            })
         });
 
         if (response.ok) {
-            await Storage.clearQueue();
+            if (queue.length > 0) await Storage.clearQueue();
             const stats = await Storage.getStats();
             stats.lastSync = new Date().toISOString();
             await Storage.set('stats', stats);
