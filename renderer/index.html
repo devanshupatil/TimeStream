@@ -10,6 +10,7 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
         rel="stylesheet" />
+    <link rel="stylesheet" href="styles/opencode.css">
     <script>
         if (window.tailwind) {
             tailwind.config = {
@@ -567,6 +568,12 @@
                     class="material-symbols-outlined">account_tree</span><span>Sources</span></a>
             <a class="nav-link" data-nav="search"><span
                     class="material-symbols-outlined">search</span><span>Search</span></a>
+            <a class="nav-item" data-nav="opencode">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                </svg>
+                <span>Learnings</span>
+            </a>
         </nav>
         <div style="padding:12px;border-top:1px solid #2d2d44">
             <a class="nav-link" data-nav="settings"><span
@@ -1189,6 +1196,25 @@
     </div>
     </div>
 
+        <div class="page" data-page="opencode" id="page-opencode">
+            <div class="oc-header">
+                <h2>What I Learned Today</h2>
+                <div class="oc-date-nav">
+                    <button id="oc-prev-day">← Yesterday</button>
+                    <span class="oc-date-label" id="oc-date-label"></span>
+                    <button id="oc-next-day" disabled>Tomorrow →</button>
+                </div>
+            </div>
+
+            <div class="oc-stats-bar" id="oc-stats-bar">
+                <span><strong id="oc-total-sessions">0</strong> Sessions</span>
+                <span><strong id="oc-total-errors">0</strong> Errors Fixed</span>
+            </div>
+
+            <div class="oc-sessions-list" id="oc-sessions-list">
+                <!-- Cards injected by opencode.js -->
+            </div>
+        </div>
 
     <script src="js/data.js"></script>
     <script>
@@ -1753,6 +1779,7 @@
         init();
 
     </script>
+    <script src="js/opencode.js"></script>
 
 </body>
 
