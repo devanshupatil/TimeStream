@@ -69,26 +69,31 @@
     }
 
     async function renderPage() {
-        const sessions = await window.electronAPI.getOpencodeSessions(selectedDate);
+        try {
+            const sessions = await window.electronAPI.getOpencodeSessions(selectedDate);
 
-        const label = document.getElementById('oc-date-label');
-        if (label) label.textContent = formatDateLabel(selectedDate);
+            const label = document.getElementById('oc-date-label');
+            if (label) label.textContent = formatDateLabel(selectedDate);
 
-        const nextBtn = document.getElementById('oc-next-day');
-        if (nextBtn) nextBtn.disabled = selectedDate >= todayStr();
+            const nextBtn = document.getElementById('oc-next-day');
+            if (nextBtn) nextBtn.disabled = selectedDate >= todayStr();
 
-        const totalEl = document.getElementById('oc-total-sessions');
-        const errorsEl = document.getElementById('oc-total-errors');
-        if (totalEl) totalEl.textContent = sessions.length;
-        if (errorsEl) errorsEl.textContent = sessions.reduce((n, s) => n + (s.errorsFixed || 0), 0);
+            const totalEl = document.getElementById('oc-total-sessions');
+            const errorsEl = document.getElementById('oc-total-errors');
+            if (totalEl) totalEl.textContent = sessions.length;
+            if (errorsEl) errorsEl.textContent = sessions.reduce((n, s) => n + (s.errorsFixed || 0), 0);
 
-        const list = document.getElementById('oc-sessions-list');
-        if (!list) return;
+            const list = document.getElementById('oc-sessions-list');
+            if (!list) return;
 
-        if (!sessions.length) { showEmpty(false); return; }
+            if (!sessions.length) { showEmpty(false); return; }
 
-        const sorted = [...sessions].sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
-        list.innerHTML = sorted.map(renderCard).join('');
+            const sorted = [...sessions].sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
+            list.innerHTML = sorted.map(renderCard).join('');
+        } catch (err) {
+            console.error('[OpenCode] Failed to load sessions:', err);
+            showEmpty(false);
+        }
     }
 
     function initNavigation() {
