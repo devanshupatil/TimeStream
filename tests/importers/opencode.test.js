@@ -1,6 +1,9 @@
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
-const { extractSession, isDuplicate, extractErrors, extractTags, extractFiles } = require('../../src/importers/opencode.js');
+const os = require('os');
+const path = require('path');
+const fs = require('fs');
+const { extractSession, isDuplicate, extractErrors, extractTags, extractFiles, saveSession, loadSessions } = require('../../src/importers/opencode.js');
 
 const SAMPLE_RAW = {
   id: 'abc123',
@@ -107,5 +110,44 @@ describe('extractFiles', () => {
   it('returns empty array when no file paths', () => {
     const msgs = [{ role: 'user', content: 'hello world' }];
     assert.deepEqual(extractFiles(msgs), []);
+  });
+});
+
+describe('loadSessions', () => {
+  it('returns empty array when file does not exist', () => {
+    const result = loadSessions('/nonexistent/path.json');
+    assert.deepEqual(result, []);
+  });
+
+  it('returns parsed sessions from valid file', () => {
+    const tmp = path.join(os.tmpdir(), `oc-test-${Date.now()}.json`);
+    fs.writeFileSync(tmp, JSON.stringify([{ sessionId: 'x1' }]));
+    const result = loadSessions(tmp);
+    assert.equal(result.length, 1);
+    assert.equal(result[0].sessionId, 'x1');
+    fs.unlinkSync(tmp);
+  });
+});
+
+describe('saveSession', () => {
+  it('saves a new session and returns true', () => {
+    const tmp = path.join(os.tmpdir(), `oc-test-${Date.now()}.json`);
+    fs.writeFileSync(tmp, JSON.stringify([]));
+    const session = { sessionId: 'new1', date: '2026-03-18' };
+    const result = saveSession(session, tmp);
+    assert.equal(result, true);
+    const stored = JSON.parse(fs.readFileSync(tmp, 'utf8'));
+    assert.equal(stored.length, 1);
+    fs.unlinkSync(tmp);
+  });
+
+  it('returns false and does not duplicate for existing sessionId', () => {
+    const tmp = path.join(os.tmpdir(), `oc-test-${Date.now()}.json`);
+    fs.writeFileSync(tmp, JSON.stringify([{ sessionId: 'dup1' }]));
+    const result = saveSession({ sessionId: 'dup1' }, tmp);
+    assert.equal(result, false);
+    const stored = JSON.parse(fs.readFileSync(tmp, 'utf8'));
+    assert.equal(stored.length, 1);
+    fs.unlinkSync(tmp);
   });
 });
