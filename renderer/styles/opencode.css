@@ -1,0 +1,126 @@
+/* ── OPENCODE DASHBOARD ─────────────────────────────────────── */
+.oc-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.oc-stats-bar {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted, #888);
+    margin-bottom: 1.5rem;
+}
+
+.oc-stats-bar strong {
+    color: var(--text-primary, #fff);
+}
+
+.oc-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.oc-date-nav button {
+    background: none;
+    border: 1px solid var(--border, #333);
+    color: var(--text-primary, #fff);
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.oc-date-nav button:hover { background: var(--hover-bg, #222); }
+.oc-date-nav button:disabled { opacity: 0.3; cursor: default; }
+
+.oc-date-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    min-width: 140px;
+    text-align: center;
+}
+
+/* Session cards */
+.oc-sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.oc-session-card {
+    background: var(--card-bg, #1a1a2e);
+    border: 1px solid var(--border, #333);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+}
+
+.oc-session-time {
+    font-size: 0.75rem;
+    color: var(--text-muted, #888);
+    margin-bottom: 0.25rem;
+}
+
+.oc-session-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+    color: var(--text-primary, #fff);
+}
+
+.oc-session-summary {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #aaa);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.oc-session-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.oc-tag {
+    background: var(--tag-bg, #2a2a4a);
+    color: var(--accent, #7c7cff);
+    border-radius: 4px;
+    padding: 2px 8px;
+}
+
+.oc-errors-badge {
+    color: var(--success, #4caf50);
+    font-weight: 600;
+}
+
+.oc-files {
+    color: var(--text-muted, #888);
+    font-style: italic;
+}
+
+/* Empty / missing dir state */
+.oc-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted, #888);
+}
+
+.oc-empty h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary, #fff); }
+.oc-empty p  { font-size: 0.85rem; line-height: 1.6; }
+.oc-empty code {
+    display: inline-block;
+    background: var(--card-bg, #1a1a2e);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
