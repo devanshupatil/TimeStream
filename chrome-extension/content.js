@@ -252,6 +252,11 @@ function trackYouTube() {
         cachedClassification = result;
         cachedClassificationUrl = location.href;
 
+        if (!result.isLearning) {
+            console.log('Skipping non-learning YouTube video.');
+            return;
+        }
+
         sendActivity({
             source: 'youtube',
             sourceLabel: 'YouTube',
