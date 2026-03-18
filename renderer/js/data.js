@@ -10,17 +10,12 @@ const fmt = (h, m) => {
 
 const ACTIVITIES = [];
 
-const TIMELINE_ENTRIES = [
-    { hour: '9 AM', activities: [] },
-    { hour: '10 AM', activities: [] },
-    { hour: '11 AM', activities: [] },
-    { hour: '12 PM', activities: [] },
-    { hour: '1 PM', activities: [] },
-    { hour: '2 PM', activities: [] },
-    { hour: '3 PM', activities: [] },
-    { hour: '4 PM', activities: [] },
-];
-
+const TIMELINE_ENTRIES = [];
+for (let i = 0; i < 24; i++) {
+    const hour = i === 0 ? 12 : i > 12 ? i - 12 : i;
+    const ampm = i < 12 ? 'AM' : 'PM';
+    TIMELINE_ENTRIES.push({ hour: `${hour} ${ampm}`, activities: [] });
+}
 function getTodayActivities() {
     return ACTIVITIES.slice().sort((a, b) => {
         const timeA = new Date(a.time || a.timestamp || 0);
