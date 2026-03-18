@@ -248,9 +248,36 @@ ipcMain.handle('get-historical-data', () => {
     return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 });
 
-// Open external links in default browser
-ipcMain.on('open-external', (_, url) => {
-    shell.openExternal(url);
+// Open external links in specified or default browser
+ipcMain.on('open-external', (_, data) => {
+    const url = typeof data === 'string' ? data : data?.url;
+    const browser = typeof data === 'string' ? undefined : data?.browser?.toLowerCase();
+
+    if (!url) return;
+
+    if (!browser) {
+        shell.openExternal(url);
+        return;
+    }
+
+    const { exec } = require('child_process');
+    const safeUrl = url.replace(/"/g, '\\"');
+
+    if (browser.includes('firefox')) {
+        exec(`firefox "${safeUrl}"`, (err) => {
+            if (err) shell.openExternal(url);
+        });
+    } else if (browser.includes('chrome')) {
+        exec(`google-chrome "${safeUrl}"`, (err) => {
+            if (err) shell.openExternal(url);
+        });
+    } else if (browser.includes('brave')) {
+        exec(`brave-browser "${safeUrl}"`, (err) => {
+            if (err) shell.openExternal(url);
+        });
+    } else {
+        shell.openExternal(url);
+    }
 });
 
 // Clear historical data
