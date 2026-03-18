@@ -17,8 +17,8 @@ function startWatcher({ storageFile, onSession, onMissingDir }) {
   }
 
   const db = new Database(OPENCODE_DB, { readonly: true });
-  // Start checking from the last 24 hours to catch recent disconnected sessions
-  let lastCheckTime = Date.now() - 24 * 60 * 60 * 1000;
+  // Start checking from just before app launch to avoid pulling old deleted sessions
+  let lastCheckTime = Date.now() - 5000;
 
   const poll = () => {
     try {
