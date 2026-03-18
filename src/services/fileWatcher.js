@@ -2,82 +2,80 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const Database = require('better-sqlite3');
 const { extractSession, saveSession } = require('../importers/opencode.js');
 
-const OPENCODE_SESSIONS_DIR = path.join(os.homedir(), '.opencode', 'sessions');
-const RETRY_DELAY_MS = 500;
-const DEBOUNCE_MS = 500;
-const MAX_RETRIES = 3;
-const MISSING_DIR_RETRY_MS = 30000;
-
-function debounce(fn, delay) {
-  let timer = null;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
-
-async function parseWithRetry(readFn, maxRetries = MAX_RETRIES, retryDelay = RETRY_DELAY_MS) {
-  let lastErr;
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      const text = await readFn();
-      return JSON.parse(text);
-    } catch (err) {
-      lastErr = err;
-      if (i < maxRetries - 1) await new Promise(r => setTimeout(r, retryDelay));
-    }
-  }
-  throw lastErr;
-}
+const OPENCODE_DB = path.join(os.homedir(), '.local', 'share', 'opencode', 'opencode.db');
+const POLL_INTERVAL_MS = 3000;
 
 function startWatcher({ storageFile, onSession, onMissingDir }) {
-  // eslint-disable-next-line global-require
-  const chokidar = require('chokidar');
-  if (!fs.existsSync(OPENCODE_SESSIONS_DIR)) {
+  if (!fs.existsSync(OPENCODE_DB)) {
     if (onMissingDir) onMissingDir();
-    const retryTimer = setTimeout(() => startWatcher({ storageFile, onSession, onMissingDir }), MISSING_DIR_RETRY_MS);
+    const retryTimer = setTimeout(() => startWatcher({ storageFile, onSession, onMissingDir }), 30000);
     if (retryTimer.unref) retryTimer.unref();
     return null;
   }
 
-  const debounceMap = new Map();
+  const db = new Database(OPENCODE_DB, { readonly: true });
+  // Start checking from the last 24 hours to catch recent disconnected sessions
+  let lastCheckTime = Date.now() - 24 * 60 * 60 * 1000;
 
-  async function processFile(filePath) {
-    if (!filePath.endsWith('.json')) return;
+  const poll = () => {
     try {
-      const raw = await parseWithRetry(
-        () => fs.promises.readFile(filePath, 'utf8')
-      );
-      const mtime = (await fs.promises.stat(filePath)).mtimeMs;
-      const session = extractSession(raw, filePath, mtime);
-      const saved = saveSession(session, storageFile);
-      if (saved && onSession) onSession(session);
+      // Find sessions updated since our last check
+      const query = db.prepare('SELECT * FROM session WHERE time_updated > ? ORDER BY time_updated ASC');
+      // Use lastCheckTime directly since `time_updated` in sqlite is also epoch ms
+      const changedSessions = query.all(lastCheckTime);
+
+      for (const sess of changedSessions) {
+        // Find messages
+        const messages = db.prepare('SELECT * FROM message WHERE session_id = ? ORDER BY time_created ASC').all(sess.id);
+
+        const finalMessages = [];
+
+        for (const msg of messages) {
+          const msgMeta = JSON.parse(msg.data);
+          const parts = db.prepare('SELECT * FROM part WHERE message_id = ? ORDER BY time_created ASC').all(msg.id);
+
+          let content = '';
+          for (const ptr of parts) {
+            const ptData = JSON.parse(ptr.data);
+            if (ptData.type === 'text' && ptData.text) {
+              content += ptData.text + '\n\n';
+            }
+          }
+
+          finalMessages.push({
+            role: msgMeta.role,
+            content: content.trim(),
+            createdAt: new Date(msg.time_created).toISOString()
+          });
+        }
+
+        const rawJson = {
+          id: sess.id,
+          title: sess.title,
+          createdAt: new Date(sess.time_created).toISOString(),
+          updatedAt: new Date(sess.time_updated).toISOString(),
+          messages: finalMessages
+        };
+
+        const parsedSession = extractSession(rawJson, 'sqlite_db', sess.time_updated);
+        const saved = saveSession(parsedSession, storageFile);
+
+        if (saved && onSession) {
+          onSession(parsedSession);
+        }
+
+        lastCheckTime = Math.max(lastCheckTime, sess.time_updated);
+      }
     } catch (err) {
-      console.warn(`[FileWatcher] Skipping ${path.basename(filePath)}: ${err.message}`);
+      console.warn('[SQLite Watcher] Error polling OpenCode db:', err);
     }
-  }
+  };
 
-  function getHandler(filePath) {
-    if (!debounceMap.has(filePath)) {
-      debounceMap.set(filePath, debounce(processFile, DEBOUNCE_MS));
-    }
-    return debounceMap.get(filePath);
-  }
-
-  const watcher = chokidar.watch(OPENCODE_SESSIONS_DIR, {
-    ignoreInitial: false,
-    persistent: true,
-    awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
-  });
-
-  watcher.on('add',    fp => getHandler(fp)(fp));
-  watcher.on('change', fp => getHandler(fp)(fp));
-  watcher.on('unlink', fp => debounceMap.delete(fp));  // cleanup
-  watcher.on('error',  err => console.error('[FileWatcher] Error:', err));
-
-  return watcher;
+  const timer = setInterval(poll, POLL_INTERVAL_MS);
+  return { close: () => { clearInterval(timer); db.close(); } };
 }
 
-module.exports = { startWatcher, debounce, parseWithRetry };
+module.exports = { startWatcher };
