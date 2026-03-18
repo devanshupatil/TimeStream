@@ -107,6 +107,7 @@ function extractSession(raw, filePath, fileMtime) {
     tags,
     filesChanged,
     source: 'opencode',
+    messages,
   };
 }
 
@@ -124,8 +125,12 @@ function loadSessions(storageFile) {
 
 function saveSession(session, storageFile) {
   const sessions = loadSessions(storageFile);
-  if (isDuplicate(session.sessionId, sessions)) return false;
-  sessions.push(session);
+  const existingIdx = sessions.findIndex(s => s.sessionId === session.sessionId);
+  if (existingIdx >= 0) {
+    sessions[existingIdx] = session;
+  } else {
+    sessions.push(session);
+  }
   fs.writeFileSync(storageFile, JSON.stringify(sessions, null, 2));
   return true;
 }
