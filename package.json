@@ -1,12 +1,17 @@
 {
   "name": "timestream",
   "main": "src/main.js",
-  "dependencies": {},
+  "dependencies": {
+    "better-sqlite3": "^12.8.0",
+    "chokidar": "^5.0.0"
+  },
   "scripts": {
+    "dev": "electron . --dev --no-sandbox",
     "start": "electron . --no-sandbox",
     "test": "node --test tests/"
   },
   "devDependencies": {
+    "@electron/rebuild": "^3.7.2",
     "electron": "^41.0.3"
   }
 }
