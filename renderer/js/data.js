@@ -14,7 +14,7 @@ const TIMELINE_ENTRIES = [];
 for (let i = 0; i < 24; i++) {
     const hour = i === 0 ? 12 : i > 12 ? i - 12 : i;
     const ampm = i < 12 ? 'AM' : 'PM';
-    TIMELINE_ENTRIES.push({ hour: `${hour} ${ampm}`, activities: [] });
+    TIMELINE_ENTRIES.push({ hourIndex: i, hour: `${hour} ${ampm}`, activities: [] });
 }
 function getTodayActivities() {
     return ACTIVITIES.slice().sort((a, b) => {
@@ -24,8 +24,21 @@ function getTodayActivities() {
     });
 }
 
-function getTimelineEntries() {
-    return TIMELINE_ENTRIES;
+function getTimelineEntries(dateStr) {
+    const targetStr = dateStr || new Date().toLocaleDateString('en-CA');
+    // Rebuild buckets dynamically based only on target day's activities
+    TIMELINE_ENTRIES.forEach(e => e.activities = []);
+    ACTIVITIES.forEach(a => {
+        const raw = a.time || a.timestamp;
+        if (!raw) return;
+        const dt = new Date(raw);
+        if (isNaN(dt.getTime())) return;
+        if (dt.toLocaleDateString('en-CA') !== targetStr) return;
+        const idx = dt.getHours();
+        if (TIMELINE_ENTRIES[idx]) TIMELINE_ENTRIES[idx].activities.push(a);
+    });
+    // Return only hours that have activities, sorted newest-first (descending hour)
+    return TIMELINE_ENTRIES.filter(e => e.activities.length > 0).reverse();
 }
 
 function formatLearningTime(totalSeconds) {
