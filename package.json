@@ -1,8 +1,12 @@
 {
-  "dependencies": {
-    "chokidar": "^5.0.0"
-  },
+  "name": "timestream",
+  "main": "src/main.js",
+  "dependencies": {},
   "scripts": {
+    "start": "electron . --no-sandbox",
     "test": "node --test tests/"
+  },
+  "devDependencies": {
+    "electron": "^41.0.3"
   }
 }
