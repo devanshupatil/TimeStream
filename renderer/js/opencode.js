@@ -1,10 +1,11 @@
 (function () {
     'use strict';
 
-    const MONTHS = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
+    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
 
     let selectedDate = todayStr();
+    let currentLoadedSessions = [];
 
     function todayStr() {
         return new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -39,15 +40,15 @@
         const filesText = (session.filesChanged || []).slice(0, 3).join(', ');
 
         return `
-        <div class="oc-session-card">
+        <div class="oc-session-card" style="cursor:pointer;" onclick="window.openOpencodeModal('${session.sessionId}')">
             <div class="oc-session-time">${formatTime(session.startTime)}</div>
             <div class="oc-session-title">${escHtml(session.title || '')}</div>
             <div class="oc-session-summary">${escHtml(session.summary || '')}</div>
             <div class="oc-session-meta">
                 ${tagsHTML}
                 ${session.errorsFixed > 0
-                    ? `<span class="oc-errors-badge">✓ ${session.errorsFixed} error${session.errorsFixed > 1 ? 's' : ''} fixed</span>`
-                    : ''}
+                ? `<span class="oc-errors-badge">✓ ${session.errorsFixed} error${session.errorsFixed > 1 ? 's' : ''} fixed</span>`
+                : ''}
                 ${filesText ? `<span class="oc-files">${escHtml(filesText)}</span>` : ''}
             </div>
         </div>`;
@@ -89,12 +90,38 @@
             if (!sessions.length) { showEmpty(false); return; }
 
             const sorted = [...sessions].sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
+            currentLoadedSessions = sorted;
             list.innerHTML = sorted.map(renderCard).join('');
         } catch (err) {
             console.error('[OpenCode] Failed to load sessions:', err);
             showEmpty(false);
         }
     }
+
+    window.openOpencodeModal = function (sessionId) {
+        const session = currentLoadedSessions.find(s => s.sessionId === sessionId);
+        if (!session) return;
+
+        const titleEl = document.getElementById('oc-modal-title');
+        const chatEl = document.getElementById('oc-modal-chat');
+        if (titleEl) titleEl.textContent = session.title || 'Transcript';
+
+        if (chatEl) {
+            const msgsHTML = (session.messages || []).map(m => {
+                const bubbleClass = m.role === 'user' ? 'oc-bubble-user' : 'oc-bubble-assistant';
+                return `<div class="oc-chat-bubble ${bubbleClass}">${escHtml(m.content || '')}</div>`;
+            }).join('');
+            chatEl.innerHTML = msgsHTML || '<div style="color:var(--text-muted);text-align:center;">No transcript available.</div>';
+        }
+
+        const backdrop = document.getElementById('oc-modal-backdrop');
+        if (backdrop) backdrop.style.display = 'flex';
+    };
+
+    window.closeOpencodeModal = function () {
+        const backdrop = document.getElementById('oc-modal-backdrop');
+        if (backdrop) backdrop.style.display = 'none';
+    };
 
     function initNavigation() {
         document.getElementById('oc-prev-day')?.addEventListener('click', () => {
@@ -128,6 +155,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         initNavigation();
         initLiveUpdates();
+
+        const closeBtn = document.getElementById('oc-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', window.closeOpencodeModal);
+
+        const backdrop = document.getElementById('oc-modal-backdrop');
+        if (backdrop) backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) window.closeOpencodeModal();
+        });
     });
 
     // Hook into existing navigate() — must load after navigate is defined
