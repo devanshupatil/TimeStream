@@ -417,7 +417,8 @@
         }
 
         /* ── Custom Calendar Dropdown ─────────────────────────── */
-        #calendar-dropdown {
+        #calendar-dropdown,
+        #tl-cal-dropdown {
             display: none;
             position: absolute;
             top: calc(100% + 8px);
@@ -426,15 +427,24 @@
             background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 14px;
-            box-shadow: 0 24px 48px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
             z-index: 9999;
             overflow: hidden;
             animation: calFadeIn 0.15s ease;
         }
+
         @keyframes calFadeIn {
-            from { opacity: 0; transform: translateY(-6px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(-6px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
+
         .cal-header {
             display: flex;
             align-items: center;
@@ -442,68 +452,148 @@
             padding: 14px 14px 10px;
             border-bottom: 1px solid var(--border);
         }
+
         .cal-nav-btn {
-            width: 30px; height: 30px;
+            width: 30px;
+            height: 30px;
             border: 1px solid var(--border);
             background: var(--sidebar-bg);
             border-radius: 7px;
             color: var(--text-secondary);
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.15s;
         }
-        .cal-nav-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-        .cal-month-year { font-size: 14px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.01em; }
+
+        .cal-nav-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .cal-month-year {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
         .cal-weekdays {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            padding: 10px 12px 2px; gap: 2px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 10px 12px 2px;
+            gap: 2px;
         }
+
         .cal-weekday {
-            text-align: center; font-size: 10px; font-weight: 700;
-            color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 0;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 4px 0;
         }
+
         .cal-grid {
-            display: grid; grid-template-columns: repeat(7, 1fr);
-            padding: 4px 12px 10px; gap: 3px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            padding: 4px 12px 10px;
+            gap: 3px;
         }
+
         .cal-day {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 7px; font-size: 13px; font-weight: 500;
-            color: var(--text-primary); cursor: pointer;
-            transition: all 0.12s; border: none; background: none; font-family: inherit;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.12s;
+            border: none;
+            background: none;
+            font-family: inherit;
         }
+
         .cal-day:hover:not(.cal-day-empty):not(.cal-day-selected) {
-            background: rgba(43,212,189,0.13); color: var(--accent);
+            background: rgba(43, 212, 189, 0.13);
+            color: var(--accent);
         }
-        .cal-day-empty { cursor: default; pointer-events: none; }
+
+        .cal-day-empty {
+            cursor: default;
+            pointer-events: none;
+        }
+
         .cal-day-today {
-            color: var(--accent); font-weight: 800;
-            background: rgba(43,212,189,0.1);
-            box-shadow: inset 0 0 0 1.5px rgba(43,212,189,0.35);
+            color: var(--accent);
+            font-weight: 800;
+            background: rgba(43, 212, 189, 0.1);
+            box-shadow: inset 0 0 0 1.5px rgba(43, 212, 189, 0.35);
         }
+
         .cal-day-selected {
-            background: var(--accent); color: #fff; font-weight: 700;
-            box-shadow: 0 2px 10px rgba(43,212,189,0.45);
+            background: var(--accent);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 2px 10px rgba(43, 212, 189, 0.45);
         }
-        .cal-day-selected.cal-day-today { box-shadow: 0 2px 10px rgba(43,212,189,0.45); }
+
+        .cal-day-selected.cal-day-today {
+            box-shadow: 0 2px 10px rgba(43, 212, 189, 0.45);
+        }
+
         .cal-footer {
-            padding: 10px 12px 12px; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-between; gap: 8px;
+            padding: 10px 12px 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
         }
+
         .cal-today-btn {
-            flex: 1; padding: 7px 12px;
-            border: 1px solid var(--border); background: var(--sidebar-bg);
-            border-radius: 8px; font-size: 12px; font-weight: 600;
-            color: var(--text-secondary); cursor: pointer; transition: all 0.15s; font-family: inherit;
+            flex: 1;
+            padding: 7px 12px;
+            border: 1px solid var(--border);
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
         }
-        .cal-today-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(43,212,189,0.08); }
+
+        .cal-today-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(43, 212, 189, 0.08);
+        }
+
         .cal-clear-btn {
             padding: 7px 12px;
-            border: 1px solid var(--border); background: var(--sidebar-bg);
-            border-radius: 8px; font-size: 12px; font-weight: 600;
-            color: var(--text-secondary); cursor: pointer; transition: all 0.15s; font-family: inherit;
+            border: 1px solid var(--border);
+            background: var(--sidebar-bg);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
         }
-        .cal-clear-btn:hover { border-color: #f87171; color: #f87171; background: rgba(248,113,113,0.08); }
+
+        .cal-clear-btn:hover {
+            border-color: #f87171;
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.08);
+        }
     </style>
 </head>
 
@@ -570,7 +660,9 @@
                     class="material-symbols-outlined">search</span><span>Search</span></a>
             <a class="nav-link" data-nav="opencode">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
                 </svg>
                 <span>Learnings</span>
             </a>
@@ -689,9 +781,45 @@
             <div style="padding:24px 32px;border-bottom:1px solid var(--border);background:var(--bg)">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
                     <div>
-                        <h1 id="timeline-date"
-                            style="font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.01em">
-                            Today</h1>
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <h1 id="timeline-date"
+                                style="font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.01em">
+                                Today</h1>
+                            <div style="position:relative">
+                                <button id="btn-calendar-timeline"
+                                    style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:13px;font-weight:500;cursor:pointer;box-shadow:var(--shadow-sm)">
+                                    <span class="material-symbols-outlined" style="font-size:16px">calendar_today</span>
+                                    <span id="tl-date-label">Today</span>
+                                </button>
+                                <div id="tl-cal-dropdown">
+                                    <div class="cal-header">
+                                        <button class="cal-nav-btn" id="tl-cal-prev">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size:15px">chevron_left</span>
+                                        </button>
+                                        <span class="cal-month-year" id="tl-cal-month-year"></span>
+                                        <button class="cal-nav-btn" id="tl-cal-next">
+                                            <span class="material-symbols-outlined"
+                                                style="font-size:15px">chevron_right</span>
+                                        </button>
+                                    </div>
+                                    <div class="cal-weekdays">
+                                        <div class="cal-weekday">Su</div>
+                                        <div class="cal-weekday">Mo</div>
+                                        <div class="cal-weekday">Tu</div>
+                                        <div class="cal-weekday">We</div>
+                                        <div class="cal-weekday">Th</div>
+                                        <div class="cal-weekday">Fr</div>
+                                        <div class="cal-weekday">Sa</div>
+                                    </div>
+                                    <div class="cal-grid" id="tl-cal-grid"></div>
+                                    <div class="cal-footer">
+                                        <button class="cal-today-btn" id="tl-cal-today-btn">Today</button>
+                                        <button class="cal-clear-btn" id="tl-cal-clear-btn">Clear</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <p style="font-size:13px;color:var(--text-secondary);margin-top:2px">Hour-by-hour activity view
                         </p>
                     </div>
@@ -711,8 +839,18 @@
                             style="font-size:14px">all_inclusive</span>All Sources</div>
                     <div class="filter-pill" data-filter="vscode"><span class="material-symbols-outlined"
                             style="font-size:14px">code</span>VS Code</div>
-                    <div class="filter-pill" data-filter="browser"><span class="material-symbols-outlined"
-                            style="font-size:14px">language</span>Browser</div>
+                    <div class="filter-pill" data-filter="chrome" data-filter-type="browser">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            style="flex-shrink:0">
+                            <circle cx="12" cy="12" r="4" fill="#4285F4" />
+                            <path d="M12 8h9.8a10 10 0 0 0-17.3-2L9 12z" fill="#EA4335" />
+                            <path d="M12 16l-4.9 8.5A10 10 0 0 0 21.8 8H12z" fill="#34A853" />
+                            <path d="M12 16a4 4 0 0 1-3.5-6l-4.9-8.5A10 10 0 0 0 12 22z" fill="#FBBC05" />
+                        </svg>Chrome
+                    </div>
+                    <div class="filter-pill" data-filter="firefox" data-filter-type="browser">
+                        <span class="material-symbols-outlined" style="font-size:14px">travel_explore</span>Firefox
+                    </div>
                     <div class="filter-pill" data-filter="terminal"><span class="material-symbols-outlined"
                             style="font-size:14px">terminal</span>Terminal</div>
                     <div class="filter-pill" data-filter="youtube"><span class="material-symbols-outlined"
@@ -1193,8 +1331,6 @@
             </div>
 
         </div>
-    </div>
-    </div>
 
         <div class="page" data-page="opencode" id="page-opencode">
             <div class="oc-header">
@@ -1214,7 +1350,21 @@
             <div class="oc-sessions-list" id="oc-sessions-list">
                 <!-- Cards injected by opencode.js -->
             </div>
+
+            <!-- Chat Modal -->
+            <div id="oc-modal-backdrop" class="oc-modal-overlay" style="display: none;">
+                <div class="oc-modal">
+                    <div class="oc-modal-header">
+                        <h3 id="oc-modal-title">Transcript</h3>
+                        <button id="oc-modal-close"
+                            style="background:transparent;border:none;color:#ffffff;font-size:1.5rem;cursor:pointer;">&times;</button>
+                    </div>
+                    <div class="oc-modal-chat" id="oc-modal-chat"></div>
+                </div>
+            </div>
         </div>
+    </div>
+    </div>
 
     <script src="js/data.js"></script>
     <script>
@@ -1267,9 +1417,27 @@
             const m = String(dt.getMinutes()).padStart(2, '0'), ap = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12; return `${h}:${m} ${ap}`;
         }
-        function openLink(url) {
+        function formatRelativeDateTime(d) {
+            const dt = new Date(d);
+            if (isNaN(dt.getTime())) return '—';
+            const today = new Date();
+            const isToday = dt.getDate() === today.getDate() &&
+                dt.getMonth() === today.getMonth() &&
+                dt.getFullYear() === today.getFullYear();
+
+            let h = dt.getHours();
+            const m = String(dt.getMinutes()).padStart(2, '0');
+            const ap = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            const timeStr = `${h}:${m} ${ap}`;
+
+            if (isToday) return timeStr;
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return `${monthNames[dt.getMonth()]} ${dt.getDate()} · ${timeStr}`;
+        }
+        function openLink(url, browser) {
             if (url && window.electronAPI?.openExternal) {
-                window.electronAPI.openExternal(url);
+                window.electronAPI.openExternal({ url, browser });
             }
         }
         function badgeHTML(cat) {
@@ -1318,7 +1486,7 @@
             }
 
             feed.innerHTML = acts.map(a => `
-    <div class="activity-card" onclick="openLink('${a.url}')">
+    <div class="activity-card" onclick="openLink('${a.url.replace(/'/g, "\\'")}', '${(a.browser || '').replace(/'/g, "\\'")}')">
       <div class="icon-circle" style="background:${iconBg(a.source)};border:2px solid var(--bg)">${iconSVG(a.source)}</div>
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
@@ -1336,13 +1504,149 @@
 
         // ── TIMELINE ──────────────────────────────────────────────
         let activeFilter = 'all';
+        let tlSelectedDate = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+
         function renderTimeline() {
-            const now = new Date();
-            document.getElementById('timeline-date').textContent =
-                now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+            const displayDate = new Date(tlSelectedDate + 'T00:00:00');
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            const isToday = tlSelectedDate === todayStr;
+
+            document.getElementById('timeline-date').textContent = isToday
+                ? displayDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+                : displayDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+            // Show/hide the "Back to Today" button
+            const todayBtn = document.getElementById('tl-today-btn');
+            if (todayBtn) todayBtn.style.display = isToday ? 'none' : 'flex';
+
+            // Set the hidden date input value so picker shows current selection
+            const dateInput = document.getElementById('tl-date-input');
+            if (dateInput) dateInput.value = tlSelectedDate;
+
             bindFilterPills();
             renderTLEntries();
         }
+
+        function tlGoToday() {
+            tlSelectedDate = new Date().toLocaleDateString('en-CA');
+            renderTimeline();
+        }
+
+        // ── TIMELINE CALENDAR ─────────────────────────────────────
+        {
+            const MONTHS_TL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const todayTL = new Date();
+            const btn = document.getElementById('btn-calendar-timeline');
+            const dropdown = document.getElementById('tl-cal-dropdown');
+            const monthYearEl = document.getElementById('tl-cal-month-year');
+            const gridEl = document.getElementById('tl-cal-grid');
+            let tlCalView = { year: todayTL.getFullYear(), month: todayTL.getMonth() };
+            let tlIsOpen = false;
+
+            function toTLDateStr(d) {
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            }
+
+            function renderTLCalendar() {
+                const { year, month } = tlCalView;
+                monthYearEl.textContent = `${MONTHS_TL[month]} ${year}`;
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const todayStr = toTLDateStr(todayTL);
+                gridEl.innerHTML = '';
+                for (let i = 0; i < firstDay; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cal-day cal-day-empty';
+                    gridEl.appendChild(cell);
+                }
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const cell = document.createElement('button');
+                    cell.className = 'cal-day';
+                    cell.textContent = d;
+                    // Disable future dates
+                    if (dateStr > todayStr) { cell.disabled = true; cell.style.opacity = '0.3'; }
+                    if (dateStr === todayStr) cell.classList.add('cal-day-today');
+                    if (dateStr === tlSelectedDate) cell.classList.add('cal-day-selected');
+                    cell.addEventListener('click', () => {
+                        tlSelectedDate = dateStr;
+                        updateTLLabel();
+                        renderTimeline();
+                        closeTLCalendar();
+                    });
+                    gridEl.appendChild(cell);
+                }
+            }
+
+            function updateTLLabel() {
+                const el = document.getElementById('tl-date-label');
+                const todayStr = toTLDateStr(todayTL);
+                if (!tlSelectedDate || tlSelectedDate === todayStr) {
+                    el.textContent = 'Today';
+                } else {
+                    const d = new Date(tlSelectedDate + 'T00:00:00');
+                    el.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+            }
+
+            function openTLCalendar() {
+                const d = new Date((tlSelectedDate || toTLDateStr(todayTL)) + 'T00:00:00');
+                tlCalView = { year: d.getFullYear(), month: d.getMonth() };
+                renderTLCalendar();
+                dropdown.style.display = 'block';
+                tlIsOpen = true;
+                btn.style.borderColor = 'var(--accent)';
+            }
+
+            function closeTLCalendar() {
+                dropdown.style.display = 'none';
+                tlIsOpen = false;
+                btn.style.borderColor = '';
+            }
+
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tlIsOpen ? closeTLCalendar() : openTLCalendar();
+            });
+
+            document.getElementById('tl-cal-prev').addEventListener('click', (e) => {
+                e.stopPropagation();
+                tlCalView.month--;
+                if (tlCalView.month < 0) { tlCalView.month = 11; tlCalView.year--; }
+                renderTLCalendar();
+            });
+
+            document.getElementById('tl-cal-next').addEventListener('click', (e) => {
+                e.stopPropagation();
+                tlCalView.month++;
+                if (tlCalView.month > 11) { tlCalView.month = 0; tlCalView.year++; }
+                renderTLCalendar();
+            });
+
+            document.getElementById('tl-cal-today-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                tlSelectedDate = toTLDateStr(todayTL);
+                updateTLLabel();
+                renderTimeline();
+                closeTLCalendar();
+            });
+
+            document.getElementById('tl-cal-clear-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                tlSelectedDate = toTLDateStr(todayTL);
+                updateTLLabel();
+                renderTimeline();
+                closeTLCalendar();
+            });
+
+            document.addEventListener('click', (e) => {
+                if (tlIsOpen && !dropdown.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                    closeTLCalendar();
+                }
+            });
+        }
+
+
         function bindFilterPills() {
             document.querySelectorAll('.filter-pill').forEach(p => {
                 p.onclick = () => {
@@ -1353,29 +1657,44 @@
             });
         }
         function renderTLEntries() {
-            const entries = window.TSData.getTimelineEntries();
-            document.getElementById('timeline-entries').innerHTML = entries.map(e => {
-                let acts = activeFilter === 'all' ? e.activities : e.activities.filter(a => a.source === activeFilter);
-                const hasDot = acts.length > 0;
-                const cardsHTML = acts.length === 0 && e.activities.length === 0 ? `
-      <div class="tl-card" style="opacity:.5"><div style="display:flex;align-items:center;gap:12px">
-        <div style="width:32px;height:32px;border-radius:8px;background:rgba(100,116,139,.1);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="color:var(--text-secondary)">coffee</span></div>
-        <div><p style="font-size:13px;font-weight:600;font-style:italic;color:var(--text-secondary)">No recorded activity</p><p style="font-size:11px;color:var(--text-secondary)">${e.hour}</p></div>
-      </div></div>` :
-                    acts.map(a => `<div class="tl-card" onclick="openLink('${a.url}')">
+            const entries = window.TSData.getTimelineEntries(tlSelectedDate);
+            const container = document.getElementById('timeline-entries');
+
+            if (entries.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text-secondary);">
+                    <span class="material-symbols-outlined" style="font-size:48px;opacity:0.3;display:block;margin-bottom:12px;">event_busy</span>
+                    <p style="font-weight:500;">No activities recorded today yet.</p>
+                    <p style="font-size:13px;margin-top:4px;">Start browsing or coding — they'll appear here.</p>
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = entries.map(e => {
+                let acts;
+                const activePill = document.querySelector('.filter-pill.active');
+                const filterType = activePill?.dataset.filterType;
+                if (activeFilter === 'all') {
+                    acts = e.activities;
+                } else if (filterType === 'browser') {
+                    // Chrome/Firefox filter: match on a.browser
+                    acts = e.activities.filter(a => (a.browser || '').toLowerCase() === activeFilter);
+                } else {
+                    acts = e.activities.filter(a => a.source === activeFilter);
+                }
+                if (acts.length === 0) return ''; // skip hours with nothing matching the filter
+                const cardsHTML = acts.map(a => `<div class="tl-card" onclick="openLink('${a.url.replace(/'/g, "\\'")}', '${(a.browser || '').replace(/'/g, "\\'")}')">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
           <div style="display:flex;align-items:center;gap:12px">
             <div style="width:32px;height:32px;border-radius:8px;background:${iconBg(a.source)};display:flex;align-items:center;justify-content:center">${iconSVG(a.source)}</div>
-            <div><p style="font-size:13px;font-weight:700;color:var(--text-primary)">${a.title}</p><p style="font-size:11px;color:var(--text-secondary)">${a.sourceLabel} • ${fmtTime(a.time)}</p></div>
+            <div><p style="font-size:13px;font-weight:700;color:var(--text-primary)">${a.title}</p><p style="font-size:11px;color:var(--text-secondary)">${a.sourceLabel} • ${fmtTime(a.time || a.timestamp)}</p></div>
           </div>
           <div style="display:flex;align-items:center">${badgeHTML(a.category)}${browserBadgeHTML(a.browser)}</div>
         </div>${a.tags ? `<div style="display:flex;gap:6px;flex-wrap:wrap">${a.tags.map(t => `<span style="font-size:10px;padding:2px 8px;border-radius:9999px;border:1px solid var(--border);color:var(--text-secondary)">${t}</span>`).join('')}</div>` : ''}</div>`).join('');
                 return `<div style="display:flex;gap:32px;margin-bottom:40px;position:relative">
       <div style="width:64px;padding-top:4px;text-align:right;flex-shrink:0"><span style="font-size:12px;font-weight:700;color:var(--text-secondary);text-transform:uppercase">${e.hour}</span></div>
-      <div class="tl-dot" style="background:${hasDot ? 'var(--accent)' : 'var(--border)'}"></div>
+      <div class="tl-dot" style="background:var(--accent)"></div>
       <div style="flex:1;display:flex;flex-direction:column;gap:10px">${cardsHTML}</div>
     </div>`;
-
             }).join('');
         }
 
@@ -1384,7 +1703,7 @@
             const res = window.TSData.search(q);
             document.getElementById('search-count').textContent = q ? `Results for "${q}"(${res.length})` : `All results(${res.length})`;
             document.getElementById('search-results').innerHTML = res.map(a => `
-    <div class="search-card" onclick="openLink('${a.url}')">
+    <div class="search-card" onclick="openLink('${a.url.replace(/'/g, "\\'")}', '${(a.browser || '').replace(/'/g, "\\'")}')">
       <div style="display:flex">
         <div style="width:200px;flex-shrink:0;background:${iconBg(a.source)};display:flex;align-items:center;justify-content:center;min-height:120px">${iconSVG(a.source, 40)}</div>
         <div style="padding:16px;flex:1;display:flex;flex-direction:column;justify-content:space-between">
@@ -1396,7 +1715,7 @@
             <h3 style="font-size:15px;font-weight:700;color:var(--text-primary)">${a.title}</h3>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
-            <span style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>${fmtTime(a.time)}</span>
+            <span style="font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><span class="material-symbols-outlined" style="font-size:14px">schedule</span>${formatRelativeDateTime(a.time || a.timestamp)}</span>
             <button style="font-size:12px;font-weight:700;color:var(--accent);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px">View Details <span class="material-symbols-outlined" style="font-size:14px">arrow_forward</span></button>
           </div>
         </div>
@@ -1628,14 +1947,14 @@
             const dropdown = document.getElementById('calendar-dropdown');
             const monthYearEl = document.getElementById('cal-month-year');
             const gridEl = document.getElementById('cal-grid');
-            const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+            const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             const todayObj = new Date();
 
             let calView = { year: todayObj.getFullYear(), month: todayObj.getMonth() };
             let isOpen = false;
 
             function toDateStr(d) {
-                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             }
 
             function renderCalendar() {
@@ -1651,7 +1970,7 @@
                     gridEl.appendChild(cell);
                 }
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                     const cell = document.createElement('button');
                     cell.className = 'cal-day';
                     cell.textContent = d;
