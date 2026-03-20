@@ -1,5 +1,11 @@
 {
   "name": "timestream",
+  "version": "1.0.0",
+  "description": "TimeStream Activity Tracker",
+  "author": {
+    "name": "Devanshu",
+    "email": "devanshu@timestream.app"
+  },
   "main": "src/main.js",
   "dependencies": {
     "better-sqlite3": "^12.8.0",
@@ -8,10 +14,31 @@
   "scripts": {
     "dev": "electron . --dev --no-sandbox",
     "start": "electron . --no-sandbox",
-    "test": "node --test tests/"
+    "test": "node --test tests/",
+    "build": "electron-builder --linux",
+    "build:deb": "electron-builder --linux deb",
+    "build:appimage": "electron-builder --linux AppImage"
+  },
+  "build": {
+    "appId": "com.timestream.app",
+    "productName": "TimeStream",
+    "files": [
+      "src/**/*",
+      "renderer/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
+    },
+    "deb": {
+      "depends": ["libgtk-3-0", "libnotify4", "libnss3", "libxss1", "libxtst6", "xdg-utils", "libatspi2.0-0", "libuuid1"]
+    }
   },
   "devDependencies": {
     "@electron/rebuild": "^3.7.2",
-    "electron": "^41.0.3"
+    "electron": "^41.0.3",
+    "electron-builder": "^25.1.8"
   }
 }

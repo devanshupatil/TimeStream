@@ -27,7 +27,15 @@
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "activity-tracker@timestream.com"
+            "id": "activity-tracker@timestream.com",
+            "data_collection_permissions": {
+                "required": [
+                    "websiteActivity"
+                ],
+                "optional": [
+                    "technicalAndInteraction"
+                ]
+            }
         }
     },
     "options_ui": {
