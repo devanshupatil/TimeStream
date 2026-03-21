@@ -47,7 +47,7 @@ test('createClaudeCliWatcher: does not call onSession for all-sidechain JSONL', 
     fs.rmSync(tmpDir, { recursive: true, force: true });
     assert.equal(called, false);
     done();
-  }, 600);
+  }, 1500);
 });
 
 test('createClaudeCliWatcher: stop can be called before start without error', () => {

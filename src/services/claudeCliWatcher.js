@@ -23,16 +23,19 @@ function createClaudeCliWatcher({ watchDir, storageFile, onSession, debounceMs =
 
     debounceMap.set(filePath, setTimeout(() => {
       debounceMap.delete(filePath);
+      try {
+        const entries = parseSessionFile(filePath);
+        if (!entries.length) return;
 
-      const entries = parseSessionFile(filePath);
-      if (!entries.length) return;
+        const fileMtime = fs.statSync(filePath).mtimeMs;
+        const session = extractSession(entries, filePath, fileMtime);
+        if (!session) return;
 
-      const fileMtime = fs.statSync(filePath).mtimeMs;
-      const session = extractSession(entries, filePath, fileMtime);
-      if (!session) return;
-
-      saveSession(session, storageFile);
-      onSession(session);
+        saveSession(session, storageFile);
+        onSession(session);
+      } catch (err) {
+        console.error('ClaudeCliWatcher: error processing', filePath, err);
+      }
     }, debounceMs));
   }
 
