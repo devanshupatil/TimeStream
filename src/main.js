@@ -3,12 +3,15 @@ const path = require('path');
 const http = require('http');
 const fs = require('fs');
 const { startWatcher } = require('./services/fileWatcher.js');
+const { createClaudeCliWatcher } = require('./services/claudeCliWatcher');
+const { getProjectDir, loadSessions } = require('./importers/claudecli');
 
 let mainWindow;
 const PORT = 3000;
 const DATA_FILE = path.join(app.getPath('userData'), 'activities.json');
 const LEARNING_FILE = path.join(app.getPath('userData'), 'learning-seconds.json');
 const OPENCODE_FILE = path.join(app.getPath('userData'), 'opencode-sessions.json');
+const CLAUDE_FILE = path.join(app.getPath('userData'), 'claude-sessions.json');
 
 // Ensure data files exist
 if (!fs.existsSync(DATA_FILE)) {
@@ -19,6 +22,9 @@ if (!fs.existsSync(LEARNING_FILE)) {
 }
 if (!fs.existsSync(OPENCODE_FILE)) {
     fs.writeFileSync(OPENCODE_FILE, JSON.stringify([]));
+}
+if (!fs.existsSync(CLAUDE_FILE)) {
+    fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
 }
 
 function createWindow() {
@@ -303,6 +309,11 @@ ipcMain.handle('get-learning-seconds', (_, date) => {
     }
 });
 
+// Get Claude CLI sessions
+ipcMain.handle('get-claude-sessions', async () => {
+    return loadSessions(CLAUDE_FILE);
+});
+
 // Get OpenCode sessions, optionally filtered by date (YYYY-MM-DD)
 ipcMain.handle('get-opencode-sessions', (_, date) => {
     try {
@@ -326,6 +337,21 @@ app.whenReady().then(() => {
             if (mainWindow) mainWindow.webContents.send('opencode-missing-dir');
         },
     });
+
+    // ── Claude CLI Watcher ─────────────────────────────────────────
+    const claudeWatchDir = getProjectDir(path.join(__dirname, '..'));
+    const claudeWatcher = createClaudeCliWatcher({
+        watchDir:    claudeWatchDir,
+        storageFile: CLAUDE_FILE,
+        onSession:   (session) => {
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.webContents.send('claude-session-updated', session);
+            }
+        },
+    });
+    claudeWatcher.start();
+
+    app.on('before-quit', () => claudeWatcher.stop());
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
