@@ -19,5 +19,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.removeAllListeners('opencode-missing-dir');
         ipcRenderer.on('opencode-missing-dir', () => cb());
     },
+    getClaudeSessions: () => ipcRenderer.invoke('get-claude-sessions'),
+    onClaudeSession: (cb) => {
+        ipcRenderer.removeAllListeners('claude-session-updated');
+        ipcRenderer.on('claude-session-updated', (_e, session) => cb(session));
+    },
     platform: process.platform,
 });
