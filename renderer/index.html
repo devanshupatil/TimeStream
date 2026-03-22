@@ -418,7 +418,8 @@
 
         /* ── Custom Calendar Dropdown ─────────────────────────── */
         #calendar-dropdown,
-        #tl-cal-dropdown {
+        #tl-cal-dropdown,
+        #oc-cal-dropdown {
             display: none;
             position: absolute;
             top: calc(100% + 8px);
@@ -1335,10 +1336,37 @@
         <div class="page" data-page="opencode" id="page-opencode">
             <div class="oc-header">
                 <h2>What I Learned Today</h2>
-                <div class="oc-date-nav">
-                    <button id="oc-prev-day">← Yesterday</button>
-                    <span class="oc-date-label" id="oc-date-label"></span>
-                    <button id="oc-next-day" disabled>Tomorrow →</button>
+                <div style="position:relative">
+                    <button id="btn-calendar-oc"
+                        style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:13px;font-weight:500;cursor:pointer;box-shadow:var(--shadow-sm)">
+                        <span class="material-symbols-outlined" style="font-size:16px">calendar_today</span>
+                        <span id="oc-date-label">Today</span>
+                    </button>
+                    <div id="oc-cal-dropdown">
+                        <div class="cal-header">
+                            <button class="cal-nav-btn" id="oc-cal-prev">
+                                <span class="material-symbols-outlined" style="font-size:15px">chevron_left</span>
+                            </button>
+                            <span class="cal-month-year" id="oc-cal-month-year"></span>
+                            <button class="cal-nav-btn" id="oc-cal-next">
+                                <span class="material-symbols-outlined" style="font-size:15px">chevron_right</span>
+                            </button>
+                        </div>
+                        <div class="cal-weekdays">
+                            <div class="cal-weekday">Su</div>
+                            <div class="cal-weekday">Mo</div>
+                            <div class="cal-weekday">Tu</div>
+                            <div class="cal-weekday">We</div>
+                            <div class="cal-weekday">Th</div>
+                            <div class="cal-weekday">Fr</div>
+                            <div class="cal-weekday">Sa</div>
+                        </div>
+                        <div class="cal-grid" id="oc-cal-grid"></div>
+                        <div class="cal-footer">
+                            <button class="cal-today-btn" id="oc-cal-today-btn">Today</button>
+                            <button class="cal-clear-btn" id="oc-cal-clear-btn">Clear</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

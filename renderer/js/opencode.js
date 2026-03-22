@@ -131,18 +131,113 @@
     };
 
     function initNavigation() {
-        document.getElementById('oc-prev-day')?.addEventListener('click', () => {
+        const todayObj = new Date();
+        const btn = document.getElementById('btn-calendar-oc');
+        const dropdown = document.getElementById('oc-cal-dropdown');
+        const monthYearEl = document.getElementById('oc-cal-month-year');
+        const gridEl = document.getElementById('oc-cal-grid');
+        if (!btn || !dropdown) return;
+
+        let calView = { year: todayObj.getFullYear(), month: todayObj.getMonth() };
+        let isOpen = false;
+
+        function toDateStr(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function renderCalendar() {
+            const { year, month } = calView;
+            const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            monthYearEl.textContent = `${MONTHS[month]} ${year}`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = toDateStr(todayObj);
+            gridEl.innerHTML = '';
+            for (let i = 0; i < firstDay; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cal-day cal-day-empty';
+                gridEl.appendChild(cell);
+            }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const cell = document.createElement('button');
+                cell.className = 'cal-day';
+                cell.textContent = d;
+                if (dateStr > today) { cell.disabled = true; cell.style.opacity = '0.3'; }
+                if (dateStr === today) cell.classList.add('cal-day-today');
+                if (dateStr === selectedDate) cell.classList.add('cal-day-selected');
+                cell.addEventListener('click', () => {
+                    selectedDate = dateStr;
+                    updateLabel();
+                    renderPage();
+                    closeCalendar();
+                });
+                gridEl.appendChild(cell);
+            }
+        }
+
+        function updateLabel() {
+            const el = document.getElementById('oc-date-label');
+            if (!el) return;
+            const today = toDateStr(todayObj);
+            if (selectedDate === today) {
+                el.textContent = 'Today';
+            } else {
+                const d = new Date(selectedDate + 'T00:00:00');
+                el.textContent = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+        }
+
+        function openCalendar() {
             const d = new Date(selectedDate + 'T00:00:00');
-            d.setDate(d.getDate() - 1);
-            selectedDate = d.toLocaleDateString('en-CA');
-            renderPage();
+            calView = { year: d.getFullYear(), month: d.getMonth() };
+            renderCalendar();
+            dropdown.style.display = 'block';
+            isOpen = true;
+            btn.style.borderColor = 'var(--accent)';
+        }
+
+        function closeCalendar() {
+            dropdown.style.display = 'none';
+            isOpen = false;
+            btn.style.borderColor = '';
+        }
+
+        btn.addEventListener('click', (e) => { e.stopPropagation(); isOpen ? closeCalendar() : openCalendar(); });
+
+        document.getElementById('oc-cal-prev')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            calView.month--;
+            if (calView.month < 0) { calView.month = 11; calView.year--; }
+            renderCalendar();
         });
 
-        document.getElementById('oc-next-day')?.addEventListener('click', () => {
-            const d = new Date(selectedDate + 'T00:00:00');
-            d.setDate(d.getDate() + 1);
-            const next = d.toLocaleDateString('en-CA');
-            if (next <= todayStr()) { selectedDate = next; renderPage(); }
+        document.getElementById('oc-cal-next')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            calView.month++;
+            if (calView.month > 11) { calView.month = 0; calView.year++; }
+            renderCalendar();
+        });
+
+        document.getElementById('oc-cal-today-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectedDate = toDateStr(todayObj);
+            updateLabel();
+            renderPage();
+            closeCalendar();
+        });
+
+        document.getElementById('oc-cal-clear-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectedDate = toDateStr(todayObj);
+            updateLabel();
+            renderPage();
+            closeCalendar();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (isOpen && !dropdown.contains(e.target) && e.target !== btn) closeCalendar();
         });
     }
 
