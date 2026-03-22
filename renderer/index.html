@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles/opencode.css">
+    <link rel="stylesheet" href="styles/claudecli.css">
     <script>
         if (window.tailwind) {
             tailwind.config = {
@@ -1366,6 +1367,19 @@
     </div>
     </div>
 
+        <!-- Claude CLI Sessions -->
+        <section id="claude-section">
+          <h2>
+            <span>🤖</span> Claude CLI Sessions
+            <span style="margin-left:auto;display:flex;gap:0.5rem;align-items:center">
+              <button id="claude-prev-day" style="background:none;border:none;cursor:pointer;color:inherit;font-size:1rem">‹</button>
+              <span id="claude-date-label" style="font-size:0.8rem;font-weight:400">Today</span>
+              <button id="claude-next-day" style="background:none;border:none;cursor:pointer;color:inherit;font-size:1rem">›</button>
+            </span>
+          </h2>
+          <div id="claude-session-list"></div>
+        </section>
+
     <script src="js/data.js"></script>
     <script>
         // ── DATA ──────────────────────────────────────────────────
@@ -2099,6 +2113,7 @@
 
     </script>
     <script src="js/opencode.js"></script>
+    <script src="js/claudecli.js"></script>
 
 </body>
 
