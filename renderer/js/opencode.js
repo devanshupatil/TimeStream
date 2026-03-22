@@ -54,16 +54,14 @@
 
         return `
         <div class="oc-session-card" style="cursor:pointer;" onclick="window.openOpencodeModal('${session.sessionId}')">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
-                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                    <div class="oc-session-time">${formatTime(session.startTime)}</div>
-                    ${techTagsHTML}
-                </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <div class="oc-session-time">${formatTime(session.startTime)}</div>
                 ${sourceBadge}
             </div>
             <div class="oc-session-title">${escHtml(session.title || '')}</div>
             <div class="oc-session-summary">${escHtml(session.summary || '')}</div>
             <div class="oc-session-meta">
+                ${techTagsHTML}
                 ${session.errorsFixed > 0
                 ? `<span class="oc-errors-badge">✓ ${session.errorsFixed} error${session.errorsFixed > 1 ? 's' : ''} fixed</span>`
                 : ''}
