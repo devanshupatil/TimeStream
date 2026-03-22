@@ -32,8 +32,21 @@
             .replace(/"/g, '&quot;');
     }
 
+    const SOURCE_TAGS = {
+        'claude-code': { label: 'Claude Code', bg: '#0d9488', color: '#fff' },
+        'opencode':    { label: 'OpenCode',    bg: '#6366f1', color: '#fff' },
+    };
+
     function renderCard(session) {
-        const tagsHTML = (session.tags || [])
+        const allTags = session.tags || [];
+        const sourceKey = allTags.find(t => SOURCE_TAGS[t]);
+        const techTags = allTags.filter(t => !SOURCE_TAGS[t]);
+
+        const sourceBadge = sourceKey
+            ? `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:${SOURCE_TAGS[sourceKey].bg};color:${SOURCE_TAGS[sourceKey].color};white-space:nowrap">${SOURCE_TAGS[sourceKey].label}</span>`
+            : '';
+
+        const techTagsHTML = techTags
             .map(t => `<span class="oc-tag">${escHtml(t)}</span>`)
             .join('');
 
@@ -41,11 +54,14 @@
 
         return `
         <div class="oc-session-card" style="cursor:pointer;" onclick="window.openOpencodeModal('${session.sessionId}')">
-            <div class="oc-session-time">${formatTime(session.startTime)}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px">
+                <div class="oc-session-time">${formatTime(session.startTime)}</div>
+                ${sourceBadge}
+            </div>
             <div class="oc-session-title">${escHtml(session.title || '')}</div>
             <div class="oc-session-summary">${escHtml(session.summary || '')}</div>
             <div class="oc-session-meta">
-                ${tagsHTML}
+                ${techTagsHTML}
                 ${session.errorsFixed > 0
                 ? `<span class="oc-errors-badge">✓ ${session.errorsFixed} error${session.errorsFixed > 1 ? 's' : ''} fixed</span>`
                 : ''}
