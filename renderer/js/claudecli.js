@@ -74,7 +74,7 @@
       .sort((a, b) => b.startTime.localeCompare(a.startTime));
 
     if (!daySessions.length) {
-      list.innerHTML = `<div class="claude-empty">No Claude CLI sessions on ${currentDate}</div>`;
+      list.innerHTML = `<div class="claude-empty">No Claude CLI sessions on ${escHtml(currentDate)}</div>`;
       return;
     }
     list.innerHTML = daySessions.map(renderCard).join('');
