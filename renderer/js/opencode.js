@@ -71,7 +71,14 @@
 
     async function renderPage() {
         try {
-            const sessions = await window.electronAPI.getOpencodeSessions(selectedDate);
+            const [ocSessions, claudeRaw] = await Promise.all([
+                window.electronAPI.getOpencodeSessions(selectedDate),
+                window.electronAPI.getClaudeSessions().catch(() => []),
+            ]);
+            const claudeSessions = claudeRaw
+                .filter(s => s.date === selectedDate)
+                .map(s => ({ ...s, tags: ['claude-code', ...(s.tags || [])] }));
+            const sessions = [...ocSessions, ...claudeSessions];
 
             const label = document.getElementById('oc-date-label');
             if (label) label.textContent = formatDateLabel(selectedDate);
@@ -141,6 +148,10 @@
 
     function initLiveUpdates() {
         window.electronAPI.onOpenCodeSessionImported((session) => {
+            if (session.date === selectedDate) renderPage();
+        });
+
+        window.electronAPI.onClaudeSession((session) => {
             if (session.date === selectedDate) renderPage();
         });
 
