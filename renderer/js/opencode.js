@@ -37,6 +37,15 @@
         'opencode':    { label: 'OpenCode',    bg: '#6366f1', color: '#fff' },
     };
 
+    function basename(p) { return p ? p.split('/').pop() : ''; }
+
+    function formatDuration(secs) {
+        if (!secs || secs < 60) return secs ? `${secs}s` : '';
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        return s > 0 ? `${m}m ${s}s` : `${m}m`;
+    }
+
     function renderCard(session) {
         const allTags = session.tags || [];
         const sourceKey = allTags.find(t => SOURCE_TAGS[t]);
@@ -50,7 +59,25 @@
             .map(t => `<span class="oc-tag">${escHtml(t)}</span>`)
             .join('');
 
-        const filesText = (session.filesChanged || []).slice(0, 3).join(', ');
+        // Show basenames only, skip noise
+        const fileNames = (session.filesChanged || [])
+            .map(basename)
+            .filter(f => f && !f.endsWith('.oga') && !f.endsWith('.wav'))
+            .slice(0, 3);
+        const filesHTML = fileNames.length
+            ? `<span class="oc-files">${escHtml(fileNames.join(', '))}</span>`
+            : '';
+
+        const duration = formatDuration(session.durationSecs);
+        const durationHTML = duration
+            ? `<span style="color:var(--text-secondary);font-size:12px">⏱ ${duration}</span>`
+            : '';
+
+        const errorsHTML = session.errorsFixed > 0
+            ? `<span class="oc-errors-badge">✓ ${session.errorsFixed} error${session.errorsFixed > 1 ? 's' : ''} fixed</span>`
+            : '';
+
+        const metaContent = [techTagsHTML, durationHTML, errorsHTML, filesHTML].filter(Boolean).join('');
 
         return `
         <div class="oc-session-card" style="cursor:pointer;" onclick="window.openOpencodeModal('${session.sessionId}')">
@@ -60,13 +87,7 @@
             </div>
             <div class="oc-session-title">${escHtml(session.title || '')}</div>
             <div class="oc-session-summary">${escHtml(session.summary || '')}</div>
-            <div class="oc-session-meta">
-                ${techTagsHTML}
-                ${session.errorsFixed > 0
-                ? `<span class="oc-errors-badge">✓ ${session.errorsFixed} error${session.errorsFixed > 1 ? 's' : ''} fixed</span>`
-                : ''}
-                ${filesText ? `<span class="oc-files">${escHtml(filesText)}</span>` : ''}
-            </div>
+            ${metaContent ? `<div class="oc-session-meta">${metaContent}</div>` : ''}
         </div>`;
     }
 
