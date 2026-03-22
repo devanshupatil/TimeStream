@@ -75,10 +75,11 @@
                 window.electronAPI.getOpencodeSessions(selectedDate),
                 window.electronAPI.getClaudeSessions().catch(() => []),
             ]);
+            const ocTagged = ocSessions.map(s => ({ ...s, tags: ['opencode', ...(s.tags || [])] }));
             const claudeSessions = claudeRaw
                 .filter(s => s.date === selectedDate)
                 .map(s => ({ ...s, tags: ['claude-code', ...(s.tags || [])] }));
-            const sessions = [...ocSessions, ...claudeSessions];
+            const sessions = [...ocTagged, ...claudeSessions];
 
             const label = document.getElementById('oc-date-label');
             if (label) label.textContent = formatDateLabel(selectedDate);
