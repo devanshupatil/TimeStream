@@ -234,6 +234,8 @@ function scanAll(projectsDir) {
   try {
     projectDirs = fs.readdirSync(projectsDir, { withFileTypes: true })
       .filter(d => d.isDirectory())
+      // Skip automated/observer project directories
+      .filter(d => !d.name.includes('claude-mem') && !d.name.includes('observer'))
       .map(d => path.join(projectsDir, d.name));
   } catch {
     return sessions;
@@ -251,8 +253,20 @@ function scanAll(projectsDir) {
         const stat = fs.statSync(filePath);
         const entries = parseSessionFile(filePath);
         if (!entries.length) continue;
+
+        // Only include sessions with real user<->assistant conversation
+        const hasUserMsg = entries.some(e => e.type === 'user' && !e.isSidechain);
+        const hasAssistantMsg = entries.some(e => e.type === 'assistant' && !e.isSidechain);
+        if (!hasUserMsg || !hasAssistantMsg) continue;
+
         const session = extractSession(entries, filePath, stat.mtimeMs);
-        if (session) sessions.push(session);
+        if (!session) continue;
+
+        // Skip automated/observer sessions by title
+        const t = (session.title || '').toLowerCase();
+        if (t.includes('claude-mem') || t.includes('memory agent')) continue;
+
+        sessions.push(session);
       } catch {
         // skip unreadable files
       }
