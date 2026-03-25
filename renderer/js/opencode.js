@@ -5,6 +5,7 @@
         'July', 'August', 'September', 'October', 'November', 'December'];
 
     let selectedDate = todayStr();
+    window.allSessions = [];
     let currentLoadedSessions = [];
 
     function todayStr() {
@@ -108,15 +109,11 @@
 
     async function renderPage() {
         try {
-            const [ocSessions, claudeRaw] = await Promise.all([
+            const [ocSessions] = await Promise.all([
                 window.electronAPI.getOpencodeSessions(selectedDate),
-                window.electronAPI.getClaudeSessions().catch(() => []),
             ]);
             const ocTagged = ocSessions.map(s => ({ ...s, tags: ['opencode', ...(s.tags || [])] }));
-            const claudeSessions = claudeRaw
-                .filter(s => s.date === selectedDate)
-                .map(s => ({ ...s, tags: ['claude-code', ...(s.tags || [])] }));
-            const sessions = [...ocTagged, ...claudeSessions];
+            const sessions = ocTagged;
 
             const label = document.getElementById('oc-date-label');
             if (label) label.textContent = formatDateLabel(selectedDate);
@@ -136,6 +133,7 @@
 
             const sorted = [...sessions].sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
             currentLoadedSessions = sorted;
+            window.allSessions = sorted;
             list.innerHTML = sorted.map(renderCard).join('');
         } catch (err) {
             console.error('[OpenCode] Failed to load sessions:', err);
@@ -144,12 +142,17 @@
     }
 
     window.openOpencodeModal = function (sessionId) {
-        const session = currentLoadedSessions.find(s => s.sessionId === sessionId);
+        const session = window.allSessions.find(s => s.sessionId === sessionId);
         if (!session) return;
 
         const titleEl = document.getElementById('oc-modal-title');
         const chatEl = document.getElementById('oc-modal-chat');
-        if (titleEl) titleEl.textContent = session.title || 'Transcript';
+
+        // Display title — fall back to cwd for untitled Claude Code sessions
+        const displayTitle = (session.title && session.title !== 'Untitled Session')
+            ? session.title
+            : (session.cwd ? session.cwd.split('/').filter(Boolean).pop() + ' session' : 'Claude Code Session');
+        if (titleEl) titleEl.textContent = displayTitle;
 
         if (chatEl) {
             const msgsHTML = (session.messages || []).map(m => {

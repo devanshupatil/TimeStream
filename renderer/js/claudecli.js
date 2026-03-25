@@ -29,33 +29,50 @@
     return String(n);
   }
 
+  const SOURCE_TAGS = {
+    'claude-code': { label: 'Claude Code', bg: '#0d9488', color: '#fff' },
+    'opencode':    { label: 'OpenCode',    bg: '#6366f1', color: '#fff' },
+  };
+
   function renderCard(session) {
+    const allTags = session.tags || [];
+    const sourceKey = allTags.find(t => SOURCE_TAGS[t]);
+    const techTags = allTags.filter(t => !SOURCE_TAGS[t]);
+
+    const sourceBadge = sourceKey
+      ? `<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:6px;background:${SOURCE_TAGS[sourceKey].bg};color:${SOURCE_TAGS[sourceKey].color};white-space:nowrap">${SOURCE_TAGS[sourceKey].label}</span>`
+      : '';
+
+    const techTagsHTML = techTags
+      .map(t => `<span class="claude-tag">${escHtml(t)}</span>`)
+      .join('');
+
     const errCount  = session.errors?.length || 0;
     const fixedCount = session.errorsFixed || 0;
     const duration  = formatDuration(session.durationSecs);
     const startTime = formatTime(session.startTime);
-    const tools     = (session.toolsUsed || []).slice(0, 4).join(', ');
-    const tokens    = formatTokens(session.tokenUsage?.total);
-    const tags      = session.tags || [];
+
+    const durationHTML = duration
+      ? `<span style="color:var(--text-secondary);font-size:12px">⏱ ${duration}</span>`
+      : '';
+    const errorsHTML = fixedCount > 0
+      ? `<span class="claude-tag error">✓ ${fixedCount} error${fixedCount > 1 ? 's' : ''} fixed</span>`
+      : '';
+    const summaryHTML = session.summary
+      ? `<div class="claude-card-summary">${escHtml(session.summary)}</div>`
+      : '';
+
+    const metaContent = [techTagsHTML, durationHTML, errorsHTML].filter(Boolean).join('');
 
     return `
-      <div class="claude-card">
-        <div class="claude-card-header">
-          <div class="claude-card-title" title="${escHtml(session.title)}">${escHtml(session.title)}</div>
+      <div class="claude-card" style="cursor:pointer" onclick="window.openOpencodeModal('${session.sessionId}')">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
           <div class="claude-card-time">${startTime}</div>
+          ${sourceBadge}
         </div>
-        <div class="claude-card-meta">
-          <span>⏱ ${duration}</span>
-          <span>💬 ${session.messageCount || 0} msgs</span>
-          <span>🪙 ${tokens} tokens</span>
-          ${tools ? `<span>🔧 ${escHtml(tools)}</span>` : ''}
-          ${session.gitBranch && session.gitBranch !== 'unknown' ? `<span>⎇ ${escHtml(session.gitBranch)}</span>` : ''}
-          ${errCount > 0 ? `<span style="color:#fca5a5">🐛 ${fixedCount}/${errCount} fixed</span>` : ''}
-        </div>
-        <div class="claude-tags">
-          ${tags.map(t => `<span class="claude-tag">${escHtml(t)}</span>`).join('')}
-          ${errCount > 0 ? `<span class="claude-tag error">errors</span>` : ''}
-        </div>
+        <div class="claude-card-title" title="${escHtml(session.title)}">${escHtml(session.title || '')}</div>
+        ${summaryHTML}
+        ${metaContent ? `<div class="claude-card-meta">${metaContent}</div>` : ''}
       </div>`;
   }
 
@@ -72,6 +89,8 @@
     const daySessions = allSessions
       .filter(s => s.date === currentDate)
       .sort((a, b) => b.startTime.localeCompare(a.startTime));
+
+    window.allSessions = daySessions;
 
     if (!daySessions.length) {
       list.innerHTML = `<div class="claude-empty">No Claude CLI sessions on ${escHtml(currentDate)}</div>`;
@@ -96,6 +115,10 @@
     window.electronAPI.onClaudeSession((session) => {
       const idx = allSessions.findIndex(s => s.sessionId === session.sessionId);
       if (idx >= 0) allSessions[idx] = session; else allSessions.push(session);
+      if (window.allSessions) {
+        const gIdx = window.allSessions.findIndex(s => s.sessionId === session.sessionId);
+        if (gIdx >= 0) window.allSessions[gIdx] = session; else window.allSessions.push(session);
+      }
       render();
     });
 
