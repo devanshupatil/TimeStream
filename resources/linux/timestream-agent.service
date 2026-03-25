@@ -1,0 +1,23 @@
+[Unit]
+Description=TimeStream Activity Tracker Agent
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /opt/timestream/agent/index.js
+Restart=always
+RestartSec=5
+StandardOutput=append:~/.timestream/logs/agent.log
+StandardError=append:~/.timestream/logs/agent.error.log
+Environment=HOME=%h
+Environment=TIMESTREAM_HOME=%h/.timestream
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.timestream
+
+[Install]
+WantedBy=default.target
