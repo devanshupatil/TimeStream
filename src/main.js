@@ -1,19 +1,18 @@
-const { app, BrowserWindow, ipcMain, shell, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, screen, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
-const { startWatcher } = require('./services/fileWatcher.js');
-const { createClaudeCliWatcher } = require('./services/claudeCliWatcher');
-const { getProjectDir, loadSessions } = require('./importers/claudecli');
+const os = require('os');
 
 let mainWindow;
+let tray = null;
+
 const PORT = 3000;
 const DATA_FILE = path.join(app.getPath('userData'), 'activities.json');
 const LEARNING_FILE = path.join(app.getPath('userData'), 'learning-seconds.json');
 const OPENCODE_FILE = path.join(app.getPath('userData'), 'opencode-sessions.json');
 const CLAUDE_FILE = path.join(app.getPath('userData'), 'claude-sessions.json');
 
-// Ensure data files exist
 if (!fs.existsSync(DATA_FILE)) {
     fs.writeFileSync(DATA_FILE, JSON.stringify([]));
 }
@@ -23,12 +22,9 @@ if (!fs.existsSync(LEARNING_FILE)) {
 if (!fs.existsSync(OPENCODE_FILE)) {
     fs.writeFileSync(OPENCODE_FILE, JSON.stringify([]));
 }
-if (!fs.existsSync(CLAUDE_FILE)) {
-    fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
-}
+fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
 
 function createWindow() {
-    // Read primary display work area to fit the screen
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
 
     mainWindow = new BrowserWindow({
@@ -48,20 +44,69 @@ function createWindow() {
 
     mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
 
-    // Maximize to fill screen on launch
-    mainWindow.maximize();
-
-    // Open DevTools in dev mode
     if (process.argv.includes('--dev')) {
         mainWindow.webContents.openDevTools();
     }
+
+    mainWindow.on('close', (event) => {
+        if (tray && !app.isQuitting) {
+            event.preventDefault();
+            mainWindow.hide();
+        }
+    });
 
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
 }
 
-// ── DATA PERSISTENCE HELPERS ────────────────────────────────
+function createTray() {
+    const iconPath = path.join(__dirname, '../renderer/icons/tray.png');
+    let icon;
+    
+    if (fs.existsSync(iconPath)) {
+        icon = nativeImage.createFromPath(iconPath);
+    } else {
+        icon = nativeImage.createEmpty();
+    }
+
+    tray = new Tray(icon);
+
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Open TimeStream',
+            click: () => {
+                if (mainWindow) {
+                    mainWindow.show();
+                    mainWindow.focus();
+                }
+            }
+        },
+        { type: 'separator' },
+        {
+            label: 'Quit',
+            click: () => {
+                app.isQuitting = true;
+                app.quit();
+            }
+        }
+    ]);
+
+    tray.setToolTip('TimeStream');
+    tray.setContextMenu(contextMenu);
+
+    tray.on('click', () => {
+        if (mainWindow) {
+            if (mainWindow.isVisible()) {
+                mainWindow.hide();
+            } else {
+                mainWindow.show();
+                mainWindow.focus();
+            }
+        }
+    });
+}
+
 let isWriting = false;
 const writeQueue = [];
 
@@ -80,10 +125,8 @@ async function processWriteQueue() {
     try {
         let currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 
-        // 1. Sort incoming activities by time (latest first)
         activities.sort((a, b) => new Date(b.timestamp || b.time) - new Date(a.timestamp || a.time));
 
-        // 2. De-duplicate batch against itself
         const uniqueIncoming = [];
         const seenInBatch = new Set();
         activities.forEach(act => {
@@ -97,7 +140,6 @@ async function processWriteQueue() {
             }
         });
 
-        // 3. Filter existing data against the unique incoming set
         uniqueIncoming.forEach(newAct => {
             const newRawDate = newAct.timestamp || newAct.time;
             const newDate = new Date(newRawDate).toISOString().split('T')[0];
@@ -109,7 +151,6 @@ async function processWriteQueue() {
                 const oldDate = new Date(oldRawDate).toISOString().split('T')[0];
                 const isSameDay = oldDate === newDate;
 
-                // De-duplicate by dedupKey if available, otherwise by URL
                 let isSameActivity = false;
                 if (newAct.dedupKey && oldAct.dedupKey) {
                     isSameActivity = oldAct.dedupKey === newAct.dedupKey;
@@ -133,9 +174,7 @@ async function processWriteQueue() {
     }
 }
 
-// ── HTTP SERVER (DATA RECEIVER) ─────────────────────────────
 const server = http.createServer((req, res) => {
-    // Enable CORS for Chrome Extension
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -146,7 +185,6 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // GET endpoint for debugging/renderer
     if (req.method === 'GET' && req.url === '/api/activity') {
         try {
             const data = fs.readFileSync(DATA_FILE, 'utf8');
@@ -169,11 +207,10 @@ const server = http.createServer((req, res) => {
 
                 if (Array.isArray(data.activities)) {
                     activities = data.activities;
-                } else if (data.source) { // Single activity object
+                } else if (data.source) {
                     activities = [data];
                 }
 
-                // Handle learning seconds if present
                 if (data.learningSeconds && typeof data.learningSeconds === 'object') {
                     try {
                         const lsData = JSON.parse(fs.readFileSync(LEARNING_FILE, 'utf8'));
@@ -194,16 +231,13 @@ const server = http.createServer((req, res) => {
 
                 let success = true;
                 if (activities.length > 0) {
-                    // Add missing timestamps
                     activities = activities.map(a => ({
                         ...a,
                         timestamp: a.timestamp || new Date().toISOString()
                     }));
 
-                    // Persist with synchronization
                     success = await saveActivities(activities);
 
-                    // Send to Renderer
                     if (mainWindow) {
                         mainWindow.webContents.send('activity-received', activities);
                     }
@@ -226,7 +260,6 @@ server.listen(PORT, () => {
     console.log(`Backend server running on http://localhost:${PORT}`);
 });
 
-// ── IPC HANDLERS ─────────────────────────────────────────────
 ipcMain.on('window-minimize', () => {
     if (mainWindow) mainWindow.minimize();
 });
@@ -249,12 +282,10 @@ ipcMain.handle('window-is-maximized', () => {
     return mainWindow ? mainWindow.isMaximized() : false;
 });
 
-// Handler for loading historical data
 ipcMain.handle('get-historical-data', () => {
     return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 });
 
-// Open external links in specified or default browser
 ipcMain.on('open-external', (_, data) => {
     const url = typeof data === 'string' ? data : data?.url;
     const browser = typeof data === 'string' ? undefined : data?.browser?.toLowerCase();
@@ -286,7 +317,6 @@ ipcMain.on('open-external', (_, data) => {
     }
 });
 
-// Clear historical data
 ipcMain.handle('clear-history', () => {
     try {
         fs.writeFileSync(DATA_FILE, JSON.stringify([]));
@@ -298,7 +328,6 @@ ipcMain.handle('clear-history', () => {
     }
 });
 
-// Get learning seconds for a specific date or all dates
 ipcMain.handle('get-learning-seconds', (_, date) => {
     try {
         const data = JSON.parse(fs.readFileSync(LEARNING_FILE, 'utf8'));
@@ -309,12 +338,11 @@ ipcMain.handle('get-learning-seconds', (_, date) => {
     }
 });
 
-// Get Claude CLI sessions
 ipcMain.handle('get-claude-sessions', async () => {
+    const { loadSessions } = require('./importers/claudecli');
     return loadSessions(CLAUDE_FILE);
 });
 
-// Get OpenCode sessions, optionally filtered by date (YYYY-MM-DD)
 ipcMain.handle('get-opencode-sessions', (_, date) => {
     try {
         const sessions = JSON.parse(fs.readFileSync(OPENCODE_FILE, 'utf8'));
@@ -325,8 +353,15 @@ ipcMain.handle('get-opencode-sessions', (_, date) => {
     }
 });
 
+const { registerQueryHandlers } = require('./app/api/query');
+const { startWatcher } = require('./services/fileWatcher.js');
+const { createClaudeCliWatcher } = require('./services/claudeCliWatcher');
+const { loadSessions, saveSession, scanLast24h } = require('./importers/claudecli');
+
 app.whenReady().then(() => {
     createWindow();
+    createTray();
+    registerQueryHandlers();
 
     startWatcher({
         storageFile: OPENCODE_FILE,
@@ -338,10 +373,12 @@ app.whenReady().then(() => {
         },
     });
 
-    // ── Claude CLI Watcher ─────────────────────────────────────────
-    const claudeWatchDir = getProjectDir(path.join(__dirname, '..'));
+    const claudeProjectsDir = path.join(os.homedir(), '.claude', 'projects');
+    const initial24h = scanLast24h(claudeProjectsDir);
+    for (const session of initial24h) saveSession(session, CLAUDE_FILE);
+
     const claudeWatcher = createClaudeCliWatcher({
-        watchDir:    claudeWatchDir,
+        watchDir:    claudeProjectsDir,
         storageFile: CLAUDE_FILE,
         onSession:   (session) => {
             if (mainWindow && !mainWindow.isDestroyed()) {

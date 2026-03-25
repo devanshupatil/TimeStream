@@ -25,4 +25,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('claude-session-updated', (_e, session) => cb(session));
     },
     platform: process.platform,
+
+    getActivities: (date) => ipcRenderer.invoke('get-activities', date),
+    getActivitiesBySource: (source, date) => ipcRenderer.invoke('get-activities-by-source', { source, date }),
+    getRecentActivities: (limit) => ipcRenderer.invoke('get-recent-activities', limit),
+    searchActivities: (query, limit) => ipcRenderer.invoke('search-activities', { query, limit }),
+    getStats: (date) => ipcRenderer.invoke('get-stats', date),
+    getSources: () => ipcRenderer.invoke('get-sources'),
 });

@@ -121,6 +121,29 @@ function extractTags(errors, filesChanged, toolsUsed) {
   return [...tags];
 }
 
+function extractMessages(entries) {
+  const messages = [];
+  for (const e of entries) {
+    if (e.isSidechain) continue;
+    if (e.type === 'user') {
+      const content = e.message?.content;
+      let text = '';
+      if (typeof content === 'string') text = content.trim();
+      else if (Array.isArray(content))
+        text = content.filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
+      if (text) messages.push({ role: 'user', content: text.slice(0, 4000) });
+    } else if (e.type === 'assistant') {
+      const content = e.message?.content;
+      let text = '';
+      if (Array.isArray(content))
+        text = content.filter(c => c.type === 'text').map(c => c.text).join('\n').trim();
+      else if (typeof content === 'string') text = content.trim();
+      if (text) messages.push({ role: 'assistant', content: text.slice(0, 4000) });
+    }
+  }
+  return messages.slice(0, 60);
+}
+
 function extractSession(entries, filePath, fileMtime) {
   if (!entries.length) return null;
   const first = entries[0];
@@ -145,6 +168,7 @@ function extractSession(entries, filePath, fileMtime) {
     filesChanged,
     toolsUsed,
     tokenUsage:   extractTokenUsage(entries),
+    messages:     extractMessages(entries),
     messageCount: entries.filter(e => (e.type === 'user' || e.type === 'assistant') && !e.isSidechain).length,
     model:        entries.find(e => e.type === 'assistant')?.message?.model || 'unknown',
     gitBranch:    first.gitBranch || 'unknown',
@@ -169,9 +193,45 @@ function saveSession(session, storageFile) {
   return true;
 }
 
+function scanLast24h(projectsDir) {
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const sessions = [];
+  let projectDirs;
+  try {
+    projectDirs = fs.readdirSync(projectsDir, { withFileTypes: true })
+      .filter(d => d.isDirectory())
+      .map(d => path.join(projectsDir, d.name));
+  } catch {
+    return sessions;
+  }
+  for (const dir of projectDirs) {
+    let files;
+    try {
+      files = fs.readdirSync(dir).filter(f => f.endsWith('.jsonl'));
+    } catch {
+      continue;
+    }
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      try {
+        const stat = fs.statSync(filePath);
+        if (stat.mtimeMs < cutoff) continue;
+        const entries = parseSessionFile(filePath);
+        if (!entries.length) continue;
+        const session = extractSession(entries, filePath, stat.mtimeMs);
+        if (session) sessions.push(session);
+      } catch {
+        // skip unreadable files
+      }
+    }
+  }
+  return sessions;
+}
+
 module.exports = {
   cwdToSlug, getProjectDir, parseSessionFile,
   extractTitle, extractDuration, extractFilesChanged,
   extractToolsUsed, extractTokenUsage, extractErrors,
-  extractTags, extractSession, isDuplicate, loadSessions, saveSession,
+  extractMessages, extractTags, extractSession, isDuplicate,
+  loadSessions, saveSession, scanLast24h,
 };
