@@ -144,6 +144,49 @@ function extractMessages(entries) {
   return messages.slice(0, 60);
 }
 
+function generateSummary(entries, filesChanged, toolsUsed, errors) {
+  // Get the first user message as the "ask"
+  const firstUser = entries.find(e => e.type === 'user' && !e.isSidechain);
+  let userAsk = '';
+  if (firstUser) {
+    const c = firstUser.message?.content;
+    if (typeof c === 'string') userAsk = c.trim();
+    else if (Array.isArray(c)) userAsk = c.filter(x => x.type === 'text').map(x => x.text).join(' ').trim();
+  }
+
+  // Clean up the user ask — remove terminal prompts, paths, system noise
+  userAsk = userAsk
+    .replace(/^(devanshu@[^$]+\$\s*)/i, '')
+    .replace(/<local-command-caveat>[^<]*<\/local-command-caveat>/gi, '')
+    .replace(/@\S+/g, '')   // remove @mentions of files
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Build summary parts
+  const parts = [];
+
+  // What the user asked (condensed)
+  if (userAsk && userAsk.length > 3) {
+    const ask = userAsk.length > 80 ? userAsk.slice(0, 77) + '...' : userAsk;
+    parts.push(ask);
+  }
+
+  // What was done
+  const actions = [];
+  if (filesChanged.length > 0) actions.push(`${filesChanged.length} file${filesChanged.length > 1 ? 's' : ''} changed`);
+  if (toolsUsed.length > 0) actions.push(`used ${toolsUsed.slice(0, 3).join(', ')}`);
+  if (errors.length > 0) {
+    const fixed = errors.filter(e => e.fixed).length;
+    if (fixed > 0) actions.push(`${fixed} error${fixed > 1 ? 's' : ''} fixed`);
+  }
+
+  if (actions.length > 0) {
+    parts.push(actions.join(' · '));
+  }
+
+  return parts.join(' — ') || '';
+}
+
 function extractSession(entries, filePath, fileMtime) {
   if (!entries.length) return null;
   const first = entries[0];
@@ -174,6 +217,7 @@ function extractSession(entries, filePath, fileMtime) {
     gitBranch: first.gitBranch || 'unknown',
     cwd: first.cwd || '',
     source: 'claudecli',
+    summary: generateSummary(entries, filesChanged, toolsUsed, errors),
   };
 }
 
