@@ -31,7 +31,7 @@
 
   const SOURCE_TAGS = {
     'claude-code': { label: 'Claude Code', bg: '#0d9488', color: '#fff' },
-    'opencode':    { label: 'OpenCode',    bg: '#6366f1', color: '#fff' },
+    'opencode': { label: 'OpenCode', bg: '#6366f1', color: '#fff' },
   };
 
   function renderCard(session) {
@@ -47,9 +47,9 @@
       .map(t => `<span class="claude-tag">${escHtml(t)}</span>`)
       .join('');
 
-    const errCount  = session.errors?.length || 0;
+    const errCount = session.errors?.length || 0;
     const fixedCount = session.errorsFixed || 0;
-    const duration  = formatDuration(session.durationSecs);
+    const duration = formatDuration(session.durationSecs);
     const startTime = formatTime(session.startTime);
 
     const durationHTML = duration
@@ -90,7 +90,9 @@
       .filter(s => s.date === currentDate)
       .sort((a, b) => b.startTime.localeCompare(a.startTime));
 
-    window.allSessions = daySessions;
+    // Register sessions in shared map for cross-script modal lookup
+    if (!window._sessionMap) window._sessionMap = {};
+    daySessions.forEach(s => { window._sessionMap[s.sessionId] = s; });
 
     if (!daySessions.length) {
       list.innerHTML = `<div class="claude-empty">No Claude CLI sessions on ${escHtml(currentDate)}</div>`;
@@ -115,10 +117,9 @@
     window.electronAPI.onClaudeSession((session) => {
       const idx = allSessions.findIndex(s => s.sessionId === session.sessionId);
       if (idx >= 0) allSessions[idx] = session; else allSessions.push(session);
-      if (window.allSessions) {
-        const gIdx = window.allSessions.findIndex(s => s.sessionId === session.sessionId);
-        if (gIdx >= 0) window.allSessions[gIdx] = session; else window.allSessions.push(session);
-      }
+      // Update shared session map for modal lookups
+      if (!window._sessionMap) window._sessionMap = {};
+      window._sessionMap[session.sessionId] = session;
       render();
     });
 

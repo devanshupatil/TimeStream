@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
         rel="stylesheet" />
     <link rel="stylesheet" href="styles/opencode.css">
-        <script>
+    <script>
         if (window.tailwind) {
             tailwind.config = {
                 darkMode: "class",
@@ -1383,35 +1383,30 @@
             <div class="oc-sessions-list" id="oc-sessions-list">
                 <!-- Cards injected by opencode.js -->
             </div>
-
-            <!-- Chat Modal -->
-            <div id="oc-modal-backdrop" class="oc-modal-overlay" style="display: none;">
-                <div class="oc-modal">
-                    <div class="oc-modal-header">
-                        <h3 id="oc-modal-title">Transcript</h3>
-                        <button id="oc-modal-close"
-                            style="background:transparent;border:none;color:#ffffff;font-size:1.5rem;cursor:pointer;">&times;</button>
-                    </div>
-                    <div class="oc-modal-chat" id="oc-modal-chat"></div>
-                </div>
-            </div>
         </div>
 
         <!-- CLAUDE CODE -->
         <div id="page-claudecode" class="page">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+            <div
+                style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
                 <div>
-                    <h2 style="font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.01em;display:flex;align-items:center;gap:10px">
-                        <span class="material-symbols-outlined" style="color:var(--accent)">terminal</span>Claude Code Sessions
+                    <h2
+                        style="font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.01em;display:flex;align-items:center;gap:10px">
+                        <span class="material-symbols-outlined" style="color:var(--accent)">terminal</span>Claude Code
+                        Sessions
                     </h2>
-                    <p style="color:var(--text-secondary);font-size:13px;margin-top:4px">Sessions from Claude Code CLI (~/.claude/projects)</p>
+                    <p style="color:var(--text-secondary);font-size:13px;margin-top:4px">Sessions from Claude Code CLI
+                        (~/.claude/projects)</p>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
-                    <button id="claude-prev-day" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-sm)">
+                    <button id="claude-prev-day"
+                        style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-sm)">
                         <span class="material-symbols-outlined" style="font-size:16px">chevron_left</span>
                     </button>
-                    <span id="claude-date-label" style="font-size:14px;font-weight:600;color:var(--text-primary);min-width:80px;text-align:center">Today</span>
-                    <button id="claude-next-day" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-sm)">
+                    <span id="claude-date-label"
+                        style="font-size:14px;font-weight:600;color:var(--text-primary);min-width:80px;text-align:center">Today</span>
+                    <button id="claude-next-day"
+                        style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-sm)">
                         <span class="material-symbols-outlined" style="font-size:16px">chevron_right</span>
                     </button>
                 </div>
@@ -1422,6 +1417,18 @@
         </div>
 
     </div>
+    </div>
+
+    <!-- Chat Modal (shared by opencode + claudecode) -->
+    <div id="oc-modal-backdrop" class="oc-modal-overlay" style="display: none;">
+        <div class="oc-modal">
+            <div class="oc-modal-header">
+                <h3 id="oc-modal-title">Transcript</h3>
+                <button id="oc-modal-close"
+                    style="background:transparent;border:none;color:#ffffff;font-size:1.5rem;cursor:pointer;">&times;</button>
+            </div>
+            <div class="oc-modal-chat" id="oc-modal-chat"></div>
+        </div>
     </div>
 
     <script src="js/data.js"></script>
@@ -2158,7 +2165,7 @@
     </script>
     <script src="js/opencode.js"></script>
     <script src="js/claudecli.js"></script>
-    
+
 </body>
 
 </html>

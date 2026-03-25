@@ -5,7 +5,6 @@
         'July', 'August', 'September', 'October', 'November', 'December'];
 
     let selectedDate = todayStr();
-    window.allSessions = [];
     let currentLoadedSessions = [];
 
     function todayStr() {
@@ -35,7 +34,7 @@
 
     const SOURCE_TAGS = {
         'claude-code': { label: 'Claude Code', bg: '#0d9488', color: '#fff' },
-        'opencode':    { label: 'OpenCode',    bg: '#6366f1', color: '#fff' },
+        'opencode': { label: 'OpenCode', bg: '#6366f1', color: '#fff' },
     };
 
     function basename(p) { return p ? p.split('/').pop() : ''; }
@@ -133,7 +132,9 @@
 
             const sorted = [...sessions].sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
             currentLoadedSessions = sorted;
-            window.allSessions = sorted;
+            // Register in shared session map for cross-script modal lookups
+            if (!window._sessionMap) window._sessionMap = {};
+            sorted.forEach(s => { window._sessionMap[s.sessionId] = s; });
             list.innerHTML = sorted.map(renderCard).join('');
         } catch (err) {
             console.error('[OpenCode] Failed to load sessions:', err);
@@ -142,7 +143,9 @@
     }
 
     window.openOpencodeModal = function (sessionId) {
-        const session = window.allSessions.find(s => s.sessionId === sessionId);
+        // Look up session from shared map (works for both OpenCode and Claude Code sessions)
+        const session = (window._sessionMap && window._sessionMap[sessionId])
+            || currentLoadedSessions.find(s => s.sessionId === sessionId);
         if (!session) return;
 
         const titleEl = document.getElementById('oc-modal-title');
