@@ -1,6 +1,6 @@
 {
   "name": "timestream",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "TimeStream Activity Tracker",
   "author": {
     "name": "Devanshu",
@@ -29,11 +29,23 @@
       "package.json"
     ],
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Utility"
     },
     "deb": {
-      "depends": ["libgtk-3-0", "libnotify4", "libnss3", "libxss1", "libxtst6", "xdg-utils", "libatspi2.0-0", "libuuid1"]
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libuuid1"
+      ]
     }
   },
   "devDependencies": {
