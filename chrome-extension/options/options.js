@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const trackingEnabled = document.getElementById('trackingEnabled');
     const trackGitHub = document.getElementById('trackGitHub');
     const trackYouTube = document.getElementById('trackYouTube');
+    const trackReddit = document.getElementById('trackReddit');
     const apiUrl = document.getElementById('apiUrl');
     const syncInterval = document.getElementById('syncInterval');
     const saveBtn = document.getElementById('save');
@@ -17,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     trackingEnabled.checked = settings.trackingEnabled;
     trackGitHub.checked = settings.trackGitHub;
     trackYouTube.checked = settings.trackYouTube;
+    trackReddit.checked = settings.trackReddit;
     apiUrl.value = settings.apiUrl;
     syncInterval.value = settings.syncInterval;
 
@@ -26,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             trackingEnabled: trackingEnabled.checked,
             trackGitHub: trackGitHub.checked,
             trackYouTube: trackYouTube.checked,
+            trackReddit: trackReddit.checked,
             apiUrl: apiUrl.value,
             syncInterval: parseInt(syncInterval.value, 10) || 5
         };

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "TimeStream Activity Tracker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Automatically records your browser-based activities and syncs them with TimeStream.",
     "permissions": [
         "storage",
@@ -17,7 +17,9 @@
         "https://chatgpt.com/*",
         "https://claude.ai/*",
         "https://www.perplexity.ai/*",
-        "https://chat.qwenlm.ai/*"
+        "https://chat.qwenlm.ai/*",
+        "https://www.reddit.com/*",
+        "https://reddit.com/*"
     ],
     "background": {
         "scripts": [
@@ -81,6 +83,16 @@
                 "https://claude.ai/*",
                 "https://www.perplexity.ai/*",
                 "https://chat.qwenlm.ai/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_end"
+        },
+        {
+            "matches": [
+                "https://www.reddit.com/*",
+                "https://reddit.com/*"
             ],
             "js": [
                 "content.js"

@@ -92,6 +92,7 @@ const Storage = {
             trackingEnabled: true,
             trackGitHub: true,
             trackYouTube: true,
+            trackReddit: true,
             syncInterval: 5, // minutes
             apiUrl: 'http://localhost:3000/api/activity'
         };

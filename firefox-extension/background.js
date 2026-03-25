@@ -53,6 +53,7 @@ async function handleNewActivity(activity) {
     // Filter by source
     if (activity.source === 'github' && !settings.trackGitHub) return;
     if (activity.source === 'youtube' && !settings.trackYouTube) return;
+    if (activity.source === 'reddit' && !settings.trackReddit) return;
 
     // De-duplication check for today
     const dedupKey = activity.dedupKey || activity.url;

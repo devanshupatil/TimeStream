@@ -13,6 +13,10 @@ const CONFIG = {
     GITHUB: {
         matches: /github\.com/
     },
+    REDDIT: {
+        matches: /reddit\.com\/r\/[^/]+\/comments\//,
+        titleSelector: 'shreddit-post h1, [data-testid="post-title"], .Post h1, h1[slot="title"]'
+    },
     AI_TOOLS: [
         { id: 'chatgpt', label: 'ChatGPT', matches: /chatgpt\.com/ },
         { id: 'claude', label: 'Claude', matches: /claude\.ai/ },
@@ -20,6 +24,22 @@ const CONFIG = {
         { id: 'qwen', label: 'Qwen', matches: /chat\.qwenlm\.ai/ }
     ]
 };
+
+// Tech/learning subreddits to track
+const TECH_SUBREDDITS = [
+    'programming', 'learnprogramming', 'webdev', 'javascript', 'python',
+    'typescript', 'rust', 'golang', 'java', 'cpp', 'csharp',
+    'reactjs', 'vuejs', 'angular', 'svelte', 'nextjs',
+    'node', 'nodejs', 'devops', 'docker', 'kubernetes',
+    'aws', 'googlecloud', 'azure', 'machinelearning', 'deeplearning',
+    'datascience', 'artificial', 'localllama', 'chatgpt', 'claudeai',
+    'linux', 'commandline', 'bash', 'vim', 'neovim',
+    'computerscience', 'algorithms', 'leetcode', 'cscareerquestions',
+    'cybersecurity', 'netsec', 'learnpython', 'learnjavascript',
+    'database', 'sql', 'mongodb', 'softwareengineering',
+    'technology', 'gamedev', 'androiddev', 'iosprogramming',
+    'flutterdev', 'reactnative', 'opensource', 'github'
+];
 
 // ── Smart YouTube Classification ──────────────────────────────
 
@@ -229,6 +249,8 @@ function detectActivity() {
         }, 180000);
     } else if (CONFIG.GITHUB.matches.test(url)) {
         trackGitHub();
+    } else if (CONFIG.REDDIT.matches.test(url)) {
+        trackReddit();
     } else {
         const aiTool = CONFIG.AI_TOOLS.find(t => t.matches.test(url));
         if (aiTool) {
@@ -272,6 +294,35 @@ function trackYouTube() {
             }
         });
     }
+}
+
+/**
+ * Extract Reddit post info (only for tech/learning subreddits)
+ */
+function trackReddit() {
+    const pathParts = location.pathname.split('/').filter(p => p);
+    // Expected: /r/{subreddit}/comments/{id}/{slug}
+    if (pathParts.length < 4 || pathParts[0] !== 'r') return;
+
+    const subreddit = pathParts[1].toLowerCase();
+    if (!TECH_SUBREDDITS.includes(subreddit)) {
+        console.log(`TimeStream: Skipping non-tech subreddit r/${subreddit}`);
+        return;
+    }
+
+    const titleEl = document.querySelector(CONFIG.REDDIT.titleSelector);
+    const title = (titleEl?.innerText || titleEl?.getAttribute('post-title') || document.title)
+        .replace(/\s*:.*reddit$/i, '').trim();
+
+    sendActivity({
+        source: 'reddit',
+        sourceLabel: 'Reddit',
+        title: title || `r/${subreddit} post`,
+        url: location.href,
+        category: 'Learning',
+        dedupKey: `reddit:${location.pathname}`,
+        metadata: { subreddit: `r/${subreddit}` }
+    });
 }
 
 /**
@@ -340,6 +391,12 @@ function isLearningPage() {
 
     // AI tools are always learning
     if (CONFIG.AI_TOOLS.some(t => t.matches.test(url))) return true;
+
+    // Reddit — only tech subreddits
+    if (CONFIG.REDDIT.matches.test(url)) {
+        const subreddit = url.match(/reddit\.com\/r\/([^/]+)\//)?.[1]?.toLowerCase();
+        return subreddit ? TECH_SUBREDDITS.includes(subreddit) : false;
+    }
 
     // YouTube — use smart classification with caching
     if (CONFIG.YOUTUBE.matches.test(url)) {

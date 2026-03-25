@@ -17,7 +17,9 @@
         "https://chatgpt.com/*",
         "https://claude.ai/*",
         "https://www.perplexity.ai/*",
-        "https://chat.qwenlm.ai/*"
+        "https://chat.qwenlm.ai/*",
+        "https://www.reddit.com/*",
+        "https://reddit.com/*"
     ],
     "background": {
         "service_worker": "background.js",
@@ -66,6 +68,16 @@
                 "https://claude.ai/*",
                 "https://www.perplexity.ai/*",
                 "https://chat.qwenlm.ai/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_end"
+        },
+        {
+            "matches": [
+                "https://www.reddit.com/*",
+                "https://reddit.com/*"
             ],
             "js": [
                 "content.js"
