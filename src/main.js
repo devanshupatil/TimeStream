@@ -22,7 +22,9 @@ if (!fs.existsSync(LEARNING_FILE)) {
 if (!fs.existsSync(OPENCODE_FILE)) {
     fs.writeFileSync(OPENCODE_FILE, JSON.stringify([]));
 }
-fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
+if (!fs.existsSync(CLAUDE_FILE)) {
+    fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
+}
 
 function createWindow() {
     const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -63,7 +65,7 @@ function createWindow() {
 function createTray() {
     const iconPath = path.join(__dirname, '../renderer/icons/tray.png');
     let icon;
-    
+
     if (fs.existsSync(iconPath)) {
         icon = nativeImage.createFromPath(iconPath);
     } else {
@@ -356,7 +358,7 @@ ipcMain.handle('get-opencode-sessions', (_, date) => {
 const { registerQueryHandlers } = require('./app/api/query');
 const { startWatcher } = require('./services/fileWatcher.js');
 const { createClaudeCliWatcher } = require('./services/claudeCliWatcher');
-const { loadSessions, saveSession, scanLast24h } = require('./importers/claudecli');
+const { loadSessions, saveSession, scanAll } = require('./importers/claudecli');
 
 app.whenReady().then(() => {
     createWindow();
@@ -374,13 +376,15 @@ app.whenReady().then(() => {
     });
 
     const claudeProjectsDir = path.join(os.homedir(), '.claude', 'projects');
-    const initial24h = scanLast24h(claudeProjectsDir);
-    for (const session of initial24h) saveSession(session, CLAUDE_FILE);
+    const allScanned = scanAll(claudeProjectsDir);
+    // Reset and repopulate with full scan
+    fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
+    for (const session of allScanned) saveSession(session, CLAUDE_FILE);
 
     const claudeWatcher = createClaudeCliWatcher({
-        watchDir:    claudeProjectsDir,
+        watchDir: claudeProjectsDir,
         storageFile: CLAUDE_FILE,
-        onSession:   (session) => {
+        onSession: (session) => {
             if (mainWindow && !mainWindow.isDestroyed()) {
                 mainWindow.webContents.send('claude-session-updated', session);
             }

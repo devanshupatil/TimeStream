@@ -1,7 +1,7 @@
 'use strict';
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
-const os   = require('os');
+const os = require('os');
 
 const ERROR_PATTERNS = [
   /error:/i, /cannot find/i, /failed/i, /exception/i,
@@ -12,21 +12,21 @@ const ERROR_PATTERNS = [
 
 const EXTENSION_TO_TAG = {
   '.js': 'javascript', '.ts': 'typescript', '.py': 'python',
-  '.go': 'golang',     '.rs': 'rust',       '.css': 'css',
-  '.html': 'html',     '.json': 'json',     '.md': 'markdown',
+  '.go': 'golang', '.rs': 'rust', '.css': 'css',
+  '.html': 'html', '.json': 'json', '.md': 'markdown',
   '.sh': 'shell',
 };
 
 const KEYWORD_TAGS = [
   { pattern: /npm|node_modules|package\.json/i, tag: 'npm' },
-  { pattern: /docker|dockerfile/i,              tag: 'docker' },
-  { pattern: /git\s/i,                          tag: 'git' },
-  { pattern: /jest|test|spec/i,                 tag: 'testing' },
-  { pattern: /auth|jwt|token|session/i,         tag: 'auth' },
-  { pattern: /react|jsx|tsx/i,                  tag: 'react' },
-  { pattern: /typescript|\.ts\b/i,              tag: 'typescript' },
-  { pattern: /electron/i,                       tag: 'electron' },
-  { pattern: /mcp|claude|anthropic/i,           tag: 'ai' },
+  { pattern: /docker|dockerfile/i, tag: 'docker' },
+  { pattern: /git\s/i, tag: 'git' },
+  { pattern: /jest|test|spec/i, tag: 'testing' },
+  { pattern: /auth|jwt|token|session/i, tag: 'auth' },
+  { pattern: /react|jsx|tsx/i, tag: 'react' },
+  { pattern: /typescript|\.ts\b/i, tag: 'typescript' },
+  { pattern: /electron/i, tag: 'electron' },
+  { pattern: /mcp|claude|anthropic/i, tag: 'ai' },
 ];
 
 function cwdToSlug(cwd) {
@@ -90,7 +90,7 @@ function extractTokenUsage(entries) {
   entries.filter(e => e.type === 'assistant').forEach(e => {
     const u = e.message?.usage;
     if (u) {
-      input  += (u.input_tokens || 0) + (u.cache_read_input_tokens || 0);
+      input += (u.input_tokens || 0) + (u.cache_read_input_tokens || 0);
       output += u.output_tokens || 0;
     }
   });
@@ -149,31 +149,31 @@ function extractSession(entries, filePath, fileMtime) {
   const first = entries[0];
   const sessionId = first.sessionId || path.basename(filePath, '.jsonl');
   const filesChanged = extractFilesChanged(entries);
-  const toolsUsed    = extractToolsUsed(entries);
-  const errors       = extractErrors(entries);
+  const toolsUsed = extractToolsUsed(entries);
+  const errors = extractErrors(entries);
   const ts = entries.map(e => e.timestamp).filter(Boolean).sort();
   const startTs = ts[0] || new Date(fileMtime).toISOString();
-  const endTs   = ts[ts.length - 1] || startTs;
+  const endTs = ts[ts.length - 1] || startTs;
 
   return {
     sessionId,
-    date:         startTs.split('T')[0],
-    startTime:    startTs.split('T')[1]?.slice(0, 8) || '00:00:00',
-    endTime:      endTs.split('T')[1]?.slice(0, 8)   || '00:00:00',
+    date: startTs.split('T')[0],
+    startTime: startTs.split('T')[1]?.slice(0, 8) || '00:00:00',
+    endTime: endTs.split('T')[1]?.slice(0, 8) || '00:00:00',
     durationSecs: extractDuration(entries),
-    title:        extractTitle(entries),
+    title: extractTitle(entries),
     errors,
-    errorsFixed:  errors.filter(e => e.fixed).length,
-    tags:         extractTags(errors, filesChanged, toolsUsed),
+    errorsFixed: errors.filter(e => e.fixed).length,
+    tags: extractTags(errors, filesChanged, toolsUsed),
     filesChanged,
     toolsUsed,
-    tokenUsage:   extractTokenUsage(entries),
-    messages:     extractMessages(entries),
+    tokenUsage: extractTokenUsage(entries),
+    messages: extractMessages(entries),
     messageCount: entries.filter(e => (e.type === 'user' || e.type === 'assistant') && !e.isSidechain).length,
-    model:        entries.find(e => e.type === 'assistant')?.message?.model || 'unknown',
-    gitBranch:    first.gitBranch || 'unknown',
-    cwd:          first.cwd || '',
-    source:       'claudecli',
+    model: entries.find(e => e.type === 'assistant')?.message?.model || 'unknown',
+    gitBranch: first.gitBranch || 'unknown',
+    cwd: first.cwd || '',
+    source: 'claudecli',
   };
 }
 
@@ -228,10 +228,43 @@ function scanLast24h(projectsDir) {
   return sessions;
 }
 
+function scanAll(projectsDir) {
+  const sessions = [];
+  let projectDirs;
+  try {
+    projectDirs = fs.readdirSync(projectsDir, { withFileTypes: true })
+      .filter(d => d.isDirectory())
+      .map(d => path.join(projectsDir, d.name));
+  } catch {
+    return sessions;
+  }
+  for (const dir of projectDirs) {
+    let files;
+    try {
+      files = fs.readdirSync(dir).filter(f => f.endsWith('.jsonl'));
+    } catch {
+      continue;
+    }
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      try {
+        const stat = fs.statSync(filePath);
+        const entries = parseSessionFile(filePath);
+        if (!entries.length) continue;
+        const session = extractSession(entries, filePath, stat.mtimeMs);
+        if (session) sessions.push(session);
+      } catch {
+        // skip unreadable files
+      }
+    }
+  }
+  return sessions;
+}
+
 module.exports = {
   cwdToSlug, getProjectDir, parseSessionFile,
   extractTitle, extractDuration, extractFilesChanged,
   extractToolsUsed, extractTokenUsage, extractErrors,
   extractMessages, extractTags, extractSession, isDuplicate,
-  loadSessions, saveSession, scanLast24h,
+  loadSessions, saveSession, scanLast24h, scanAll,
 };
