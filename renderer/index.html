@@ -668,10 +668,6 @@
                 </svg>
                 <span>Learnings</span>
             </a>
-            <a class="nav-link" data-nav="claudecode">
-                <span class="material-symbols-outlined">terminal</span>
-                <span>Claude Code</span>
-            </a>
         </nav>
         <div style="padding:12px;border-top:1px solid #2d2d44">
             <a class="nav-link" data-nav="settings"><span
@@ -1382,37 +1378,6 @@
 
             <div class="oc-sessions-list" id="oc-sessions-list">
                 <!-- Cards injected by opencode.js -->
-            </div>
-        </div>
-
-        <!-- CLAUDE CODE -->
-        <div id="page-claudecode" class="page">
-            <div
-                style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-                <div>
-                    <h2
-                        style="font-size:22px;font-weight:800;color:var(--text-primary);letter-spacing:-0.01em;display:flex;align-items:center;gap:10px">
-                        <span class="material-symbols-outlined" style="color:var(--accent)">terminal</span>Claude Code
-                        Sessions
-                    </h2>
-                    <p style="color:var(--text-secondary);font-size:13px;margin-top:4px">Sessions from Claude Code CLI
-                        (~/.claude/projects)</p>
-                </div>
-                <div style="display:flex;align-items:center;gap:8px">
-                    <button id="claude-prev-day"
-                        style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-sm)">
-                        <span class="material-symbols-outlined" style="font-size:16px">chevron_left</span>
-                    </button>
-                    <span id="claude-date-label"
-                        style="font-size:14px;font-weight:600;color:var(--text-primary);min-width:80px;text-align:center">Today</span>
-                    <button id="claude-next-day"
-                        style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text-primary);cursor:pointer;box-shadow:var(--shadow-sm)">
-                        <span class="material-symbols-outlined" style="font-size:16px">chevron_right</span>
-                    </button>
-                </div>
-            </div>
-            <div id="claude-section">
-                <div id="claude-session-list"></div>
             </div>
         </div>
 
@@ -2164,7 +2129,6 @@
 
     </script>
     <script src="js/opencode.js"></script>
-    <script src="js/claudecli.js"></script>
 
 </body>
 

@@ -108,11 +108,15 @@
 
     async function renderPage() {
         try {
-            const [ocSessions] = await Promise.all([
+            const [ocSessions, claudeRaw] = await Promise.all([
                 window.electronAPI.getOpencodeSessions(selectedDate),
+                window.electronAPI.getClaudeSessions().catch(() => []),
             ]);
             const ocTagged = ocSessions.map(s => ({ ...s, tags: ['opencode', ...(s.tags || [])] }));
-            const sessions = ocTagged;
+            const claudeSessions = claudeRaw
+                .filter(s => s.date === selectedDate)
+                .map(s => ({ ...s, tags: ['claude-code', ...(s.tags || [])] }));
+            const sessions = [...ocTagged, ...claudeSessions];
 
             const label = document.getElementById('oc-date-label');
             if (label) label.textContent = formatDateLabel(selectedDate);
@@ -132,7 +136,7 @@
 
             const sorted = [...sessions].sort((a, b) => (a.startTime < b.startTime ? -1 : 1));
             currentLoadedSessions = sorted;
-            // Register in shared session map for cross-script modal lookups
+            // Register in shared session map for modal lookups
             if (!window._sessionMap) window._sessionMap = {};
             sorted.forEach(s => { window._sessionMap[s.sessionId] = s; });
             list.innerHTML = sorted.map(renderCard).join('');
