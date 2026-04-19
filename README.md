@@ -260,6 +260,47 @@ TimeStream is now active. Open GitHub, watch a tutorial, chat with AI — your t
 
 ---
 
+## ⚙️ CI/CD Pipeline
+
+TimeStream uses **GitHub Actions** for automated testing, building, and releasing.
+
+| Workflow | Trigger | What it does |
+|----------|---------|--------------|
+| **Continuous Integration** | Every push / PR to `main` | Validates manifests, packages extensions, uploads build artifacts |
+| **Release** | Push a version tag (e.g. `v1.2.0`) | Builds Chrome extension zip + creates a GitHub Release automatically |
+
+```
+Push to main
+     │
+     ▼
+┌─────────────────────────────┐
+│  CI Workflow                │
+│  ✔ Install dependencies     │
+│  ✔ Validate manifests (jq)  │
+│  ✔ Package Chrome extension │
+│  ✔ Package Firefox extension│
+│  ✔ Upload build artifacts   │
+└─────────────────────────────┘
+
+Push tag v*
+     │
+     ▼
+┌─────────────────────────────┐
+│  Release Workflow           │
+│  ✔ Build extension zip      │
+│  ✔ Create GitHub Release    │
+│  ✔ Attach extension files   │
+│  ✔ Auto-generate changelog  │
+└─────────────────────────────┘
+```
+
+[![CI](https://github.com/devanshupatil/TimeStream/actions/workflows/ci.yml/badge.svg)](https://github.com/devanshupatil/TimeStream/actions/workflows/ci.yml)
+[![Release](https://github.com/devanshupatil/TimeStream/actions/workflows/release.yml/badge.svg)](https://github.com/devanshupatil/TimeStream/actions/workflows/release.yml)
+
+<br/>
+
+---
+
 ## 📦 Build for Distribution
 
 ```bash
