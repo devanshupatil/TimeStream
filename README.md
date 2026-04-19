@@ -1,301 +1,276 @@
 <div align="center">
 
-<img src="renderer/icons/tray.png" alt="TimeStream Logo" width="80" height="80" />
+<br/>
 
-# TimeStream
+<img src="https://img.shields.io/badge/-%E2%8F%B1%EF%B8%8F%20TimeStream-2bd4bd?style=for-the-badge&logoColor=white&labelColor=0f172a" height="42"/>
 
-**Your developer productivity, tracked automatically.**
+<h3>Your coding life, automatically recorded.</h3>
 
-*A beautiful Electron app that silently records everything you learn, build, and explore — then surfaces it as actionable insights.*
+<p>An open-source desktop app that silently tracks everything you learn and build — <br/>then turns it into a beautiful daily insights dashboard.</p>
 
-[![Version](https://img.shields.io/badge/version-1.2.0-2bd4bd?style=flat-square)](package.json)
-[![Platform](https://img.shields.io/badge/platform-Linux-0f172a?style=flat-square&logo=linux)](https://electronjs.org)
-[![Electron](https://img.shields.io/badge/Electron-41-47848F?style=flat-square&logo=electron&logoColor=white)](https://electronjs.org)
-[![License](https://img.shields.io/badge/license-MIT-10b981?style=flat-square)](#license)
+[![Built with Electron](https://img.shields.io/badge/Electron-41-47848F?style=flat-square&logo=electron&logoColor=white)](https://electronjs.org)
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](#)
+[![Firefox Extension](https://img.shields.io/badge/Firefox-Extension-FF7139?style=flat-square&logo=firefox&logoColor=white)](#)
+[![100% Local](https://img.shields.io/badge/Privacy-100%25%20Local-10b981?style=flat-square&logo=shield&logoColor=white)](#)
+[![Version](https://img.shields.io/badge/Version-1.2.0-0f172a?style=flat-square)](#)
 
 <br/>
 
-![TimeStream Dashboard](https://raw.githubusercontent.com/devanshupatil/TimeStream/main/docs/preview.png)
+---
+
+### 🏆 *"The developer who reflects grows fastest."*
+
+---
 
 </div>
 
----
+<br/>
 
-## ✨ What is TimeStream?
+## 🤔 The Problem
 
-TimeStream is a **passive developer productivity tracker** that runs quietly in your system tray, recording every meaningful thing you do throughout the day — YouTube tutorials you watched, GitHub repos you explored, AI prompts you fired off, and coding sessions you powered through — and weaves it all into a beautiful, searchable timeline.
+You code for hours. You watch tutorials. You chat with AI. You browse GitHub.
 
-No manual input. No timers to start/stop. Just open your laptop and TimeStream handles the rest.
+**But at the end of the week — can you actually remember what you did?**
 
----
+Most developers have zero visibility into their own habits. You can't improve what you can't measure.
 
-## 🚀 Features
+<br/>
 
-### 🧠 Smart Activity Detection
-- **YouTube** — Classifies videos as *Learning* or *Entertainment* using a multi-signal AI (title keywords, channel reputation, description, hashtags). Only logs educational content.
-- **GitHub** — Tracks repos, commits, PRs, and issues you browse.
-- **Reddit** — Filters for 50+ tech/programming subreddits only.
-- **AI Tools** — Captures conversations with ChatGPT, Claude, Perplexity, and Qwen, including the chat title.
+## 💡 The Solution
 
-### 📊 Analytics & Insights
-- **Weekly / Monthly** bar chart of your activity volume
-- **Category breakdown** — Coding, Learning, Research, DevOps, Other
-- **Top Sources** ranked by activity count
-- **Day streak** tracker — how many consecutive days have you been active?
-- **Average daily learning time** from heartbeat data
+**TimeStream** runs silently in your system tray and automatically logs every meaningful developer activity — no manual input, no timers, no friction.
 
-### 🕐 Timeline View
-- Chronological feed of everything you did on any given day
-- Filter by category (All / Coding / Learning / Research / DevOps)
-- Click any card to re-open the source URL in your browser
+Just open your laptop and your day gets recorded.
 
-### 🔎 Full-Text Search
-- Search across all historical activities by title, source, or category
-
-### 🤖 AI Session Tracking (Learnings)
-- Automatically imports **OpenCode** coding sessions from local SQLite databases
-- Imports **Claude CLI** conversation sessions with full transcripts
-- Shows session duration, project context, and message summaries
-
-### 🔒 100% Local & Private
-- All data is stored as JSON on your machine (`~/.config/timestream/`)
-- No cloud. No telemetry. No accounts.
+<br/>
 
 ---
 
-## 🖥️ Screenshots
+## ✨ What TimeStream Tracks
 
-| Dashboard | Timeline | Analytics |
-|-----------|----------|-----------|
-| Daily activity feed with sync | Hour-by-hour timeline | Live data charts |
+<table>
+<tr>
+<td width="50%">
 
-| Learnings | Search | Sources |
-|-----------|--------|---------|
-| OpenCode + Claude sessions | Full-text activity search | Manage integrations |
+### 🌐 Browser Activity
+Every meaningful tab you open.
+
+| Source | What's Captured |
+|--------|----------------|
+| 🎬 **YouTube** | Educational videos (smart AI filter) |
+| 🐙 **GitHub** | Repos, PRs, issues, commits |
+| 🤖 **ChatGPT** | Your conversation topics |
+| 🧠 **Claude AI** | Your AI prompts & sessions |
+| 🔍 **Perplexity** | Research queries |
+| 💬 **Reddit** | Tech & programming posts |
+
+</td>
+<td width="50%">
+
+### 💻 Local Dev Activity
+What you're building, automatically.
+
+| Source | What's Captured |
+|--------|----------------|
+| ⚡ **OpenCode** | Coding sessions + duration |
+| 🤖 **Claude CLI** | Agent conversations |
+| 📊 **Learning time** | Exact minutes spent learning |
+| 🔥 **Daily streaks** | Consecutive active days |
+| 📈 **Weekly patterns** | Your peak productivity hours |
+
+</td>
+</tr>
+</table>
+
+<br/>
 
 ---
 
-## 🏗️ Architecture
+## 🎯 Core Features
+
+<br/>
+
+**📊 Analytics Dashboard**
+> See your weekly and monthly activity bar chart. Find out which category consumes most of your time — Coding, Learning, Research, or DevOps. All from real data, zero guesswork.
+
+<br/>
+
+**🕐 Timeline View**
+> A chronological feed of everything you did, hour by hour. Filter by category. Click any card to re-open the source. Think of it as your personal developer logbook.
+
+<br/>
+
+**🧠 AI Session Learnings**
+> TimeStream imports your OpenCode and Claude CLI sessions — including project context, conversation summaries, and session duration — into a dedicated **Learnings** view.
+
+<br/>
+
+**🔎 Powerful Search**
+> Instantly search across your entire history. *"What was that react tutorial I watched last week?"* — found in milliseconds.
+
+<br/>
+
+**🔒 100% Private**
+> All data lives on your machine. There is no server. No cloud. No tracking. No accounts. TimeStream can never see your data.
+
+<br/>
+
+---
+
+## 🧠 How Smart is the YouTube Filter?
+
+Most tracking apps log *everything*. TimeStream is smarter.
+
+It uses a **multi-signal scoring algorithm** to decide if a YouTube video is actually educational before logging it:
 
 ```
-TimeStream/
-├── src/
-│   ├── main.js              # Electron main process + HTTP server (port 3000)
-│   ├── preload.js           # Secure IPC bridge (contextBridge)
-│   ├── services/
-│   │   ├── fileWatcher.js       # Watches OpenCode SQLite databases
-│   │   └── claudeCliWatcher.js  # Watches Claude CLI JSONL sessions
-│   ├── importers/
-│   │   └── claudecli.js         # Parses Claude CLI conversation files
-│   ├── app/
-│   │   ├── api/query.js         # IPC query handlers
-│   │   └── readers/             # OpenCode, GitHub, browser readers
-│   └── shared/
-│       └── constants.js
-│
-├── renderer/
-│   ├── index.html           # Single-page app (Dashboard, Timeline, Analytics…)
-│   ├── js/
-│   │   ├── data.js          # TSData module — activity store + stats
-│   │   └── opencode.js      # Learnings page renderer
-│   └── styles/
-│
-├── chrome-extension/        # Manifest V3 Chrome extension
-│   ├── content.js           # Site scraper + classifier
-│   ├── background.js        # Service worker + sync queue
-│   └── popup/               # Extension popup UI
-│
-└── firefox-extension/       # Firefox-compatible extension
+📌 Strong learning keyword in title  ("tutorial", "how to", "explained")  → +4 pts
+🏷️  Tech keyword in title             ("React", "Docker", "Python"...)      → +1.5 pts each
+🎓 Known educational channel         (Fireship, FreeCodeCamp, NeetCode...) → +4 pts
+📝 Educational cues in description  ("source code", "follow along"...)     → +0.5 pts each
+#️⃣  Tech hashtags in description                                            → +0.5 pts each
+
+Score ≥ 3  →  ✅ Logged as "Learning"
+Score < 3  →  ❌ Silently ignored
 ```
 
-### Data Flow
+*"Top 10 Minecraft Moments"* — **ignored**.
+*"Building a REST API with Node.js — Full Tutorial"* — **logged** ✅
 
-```
-Browser (Chrome/Firefox Extension)
-        │  POST /api/activity (localhost:3000)
-        ▼
-Electron Main Process (main.js)
-        │  Deduplication + persistence
-        ▼
-activities.json  ◄──┐
-learning-seconds.json        │
-opencode-sessions.json   FileWatcher (chokidar)
-claude-sessions.json     ClaudeCliWatcher
-        │
-        ▼
-IPC (preload.js) → Renderer (index.html)
-```
+<br/>
 
 ---
 
-## 📦 Installation
+## 🚀 Get Started in 5 Minutes
 
-### Prerequisites
-
-| Tool | Version |
-|------|---------|
-| Node.js | ≥ 18 |
-| npm | ≥ 9 |
-| Chrome or Firefox | Latest |
-
-### 1. Clone & Install
+### Step 1 — Clone & Install
 
 ```bash
 git clone https://github.com/devanshupatil/TimeStream.git
 cd TimeStream
-npm install
+npm install && npx @electron/rebuild
 ```
 
-### 2. Rebuild Native Modules
-
-```bash
-npx @electron/rebuild
-```
-
-> Required for `better-sqlite3` to work with Electron's Node version.
-
-### 3. Run in Development
+### Step 2 — Run the App
 
 ```bash
 npm run dev
 ```
 
-### 4. Install the Browser Extension
+### Step 3 — Install the Browser Extension
 
-**Chrome:**
-1. Go to `chrome://extensions`
-2. Enable **Developer Mode**
-3. Click **Load Unpacked** → select the `chrome-extension/` folder
+**Chrome:** `chrome://extensions` → Enable Developer Mode → **Load Unpacked** → select `chrome-extension/`
 
-**Firefox:**
-1. Go to `about:debugging`
-2. Click **This Firefox** → **Load Temporary Add-on**
-3. Select `firefox-extension/manifest.json`
+**Firefox:** `about:debugging` → This Firefox → **Load Temporary Add-on** → select `firefox-extension/manifest.json`
 
----
+### Step 4 — Browse Normally
+TimeStream is now active. Open GitHub, watch a tutorial, chat with AI — your timeline will populate automatically.
 
-## 🔨 Build for Production
-
-```bash
-# AppImage (recommended for Linux)
-npm run build:appimage
-
-# Debian package
-npm run build:deb
-
-# Both
-npm run build
-```
-
-Output is in the `dist/` directory.
+<br/>
 
 ---
 
-## 🌐 What Gets Tracked?
-
-| Source | Trigger | Category |
-|--------|---------|----------|
-| 🎬 YouTube | Watch a video for **3+ minutes** (learning content only) | Learning |
-| 🐙 GitHub | Browse a repo, PR, commit, or issue | Coding |
-| 🤖 ChatGPT | Chat session lasting **3+ minutes** | Learning |
-| 🤖 Claude | Chat session lasting **3+ minutes** | Learning |
-| 🔍 Perplexity | Search session lasting **3+ minutes** | Learning |
-| 💬 Reddit | Browse a post in a **tech subreddit** | Learning |
-| 💻 OpenCode | Coding session detected from local SQLite | Coding |
-| 🧠 Claude CLI | CLI conversation parsed from JSONL logs | Learning |
-
-### Smart YouTube Classification
-
-TimeStream uses a **multi-signal scoring system** to decide if a YouTube video is educational before logging it:
-
-| Signal | Points |
-|--------|--------|
-| Strong keyword in title (`tutorial`, `explained`, `how to`…) | +4 |
-| Tech keywords in title (`react`, `docker`, `python`…) | +1.5 each, max +4 |
-| Known educational channel (`Fireship`, `FreeCodeCamp`…) | +4 |
-| Educational keywords in description | +0.5 each, max +2 |
-| Tech hashtags | +0.5 each, max +1.5 |
-
-**Score ≥ 3 → logged as Learning. Score < 3 → skipped.**
-
----
-
-## ⚙️ Configuration
-
-All data is stored in your Electron user data directory:
+## 🏗️ How It Works
 
 ```
-~/.config/timestream/
-├── activities.json          # Browser activity history (max 1000 entries)
-├── learning-seconds.json    # Daily learning time from heartbeat
-├── opencode-sessions.json   # OpenCode coding sessions
-└── claude-sessions.json     # Claude CLI sessions
+┌─────────────────────────────────────────────────────────────┐
+│                    YOUR BROWSER                              │
+│  Chrome / Firefox Extension silently watches your tabs      │
+│  ▸ Detects GitHub, YouTube, Reddit, AI tools               │
+│  ▸ Applies smart filters (3-min rule + content scoring)    │
+└────────────────────────┬────────────────────────────────────┘
+                         │ POST localhost:3000/api/activity
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  TIMESTREAM DESKTOP APP                      │
+│  Electron main process receives and deduplicates events     │
+│  ▸ Persists to local JSON (activities.json)                │
+│  ▸ Watches OpenCode SQLite + Claude CLI log files          │
+│  ▸ Sends live updates to the renderer via IPC              │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    YOUR DASHBOARD                            │
+│  Beautiful UI with Timeline · Analytics · Search · Learnings│
+└─────────────────────────────────────────────────────────────┘
 ```
 
-The local HTTP server runs on **port 3000** and is only accessible from `localhost`.
+<br/>
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Desktop App | [Electron](https://electronjs.org) 41 |
-| Database | JSON files + [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) |
-| File Watching | [chokidar](https://github.com/paulmillr/chokidar) 5 |
-| Browser Extension | Manifest V3 (Chrome + Firefox) |
-| Frontend | Vanilla HTML/CSS/JS + Tailwind CDN |
-| Build | [electron-builder](https://www.electron.build) |
+| Layer | Technology | Why |
+|-------|-----------|-----|
+| Desktop | **Electron 41** | Cross-platform native app |
+| Extension | **Manifest V3** (Chrome + Firefox) | Secure, modern extension API |
+| File Watching | **chokidar 5** | Reliable cross-platform FS events |
+| Local DB | **better-sqlite3** | Fast, zero-config embedded SQL |
+| Frontend | **Vanilla JS + Tailwind** | Zero build step, fast iteration |
+| Packaging | **electron-builder** | AppImage + .deb for Linux |
+
+<br/>
 
 ---
 
-## 🧪 Running Tests
+## 📦 Build for Distribution
 
 ```bash
-npm test
+npm run build:appimage    # → AppImage (portable, no install needed)
+npm run build:deb         # → Debian/Ubuntu .deb package
+npm run build             # → Both
 ```
 
-Tests live in the `tests/` directory and run with Node's built-in test runner.
+<br/>
 
 ---
 
-## 🗺️ Roadmap
+## 🗺️ What's Coming Next
 
-- [ ] **Heatmap calendar** — GitHub-style contribution graph of your learning days
-- [ ] **Tags & Projects** — manually group activities into projects
-- [ ] **Export** — CSV / Markdown weekly reports
-- [ ] **VSCode extension** — track files edited per session
-- [ ] **Pomodoro integration** — link focus sessions to activities
-- [ ] **Weekly digest** — auto-generate a summary of what you learned this week
+- [ ] 🗓️ **GitHub-style heatmap** — see your consistency at a glance
+- [ ] 📁 **Project tagging** — group activities into projects
+- [ ] 📤 **Weekly Markdown reports** — export your week to share or reflect
+- [ ] 💻 **VS Code extension** — track files and features you touch
+- [ ] 🍅 **Pomodoro integration** — link focus sessions to activities
+- [ ] 🌍 **Multi-language support**
+
+<br/>
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! To get started:
+TimeStream is open source and contributions are very welcome!
 
 ```bash
-# Fork the repo, then:
-git clone https://github.com/<your-username>/TimeStream.git
-cd TimeStream
-npm install
-npm run dev
+# Fork → Clone → Install → Build
+git clone https://github.com/<you>/TimeStream.git
+cd TimeStream && npm install && npm run dev
 ```
 
-Please open an issue before submitting a large PR so we can discuss the approach.
+Open an issue first for big features. PRs for bug fixes are always welcome directly.
 
----
-
-## 📄 License
-
-MIT © [Devanshu Patil](https://github.com/devanshupatil)
+<br/>
 
 ---
 
 <div align="center">
 
-**Built with ☕ and curiosity.**
+## 🌟 If this resonates with you — star the repo!
 
-*Stop wondering what you did last Tuesday. TimeStream remembers.*
+*Built by a developer, for developers.*
+*Because the people who track their growth are the ones who keep growing.*
+
+<br/>
+
+**[⭐ Star on GitHub](https://github.com/devanshupatil/TimeStream)** · **[🐛 Report an Issue](https://github.com/devanshupatil/TimeStream/issues)** · **[💬 Start a Discussion](https://github.com/devanshupatil/TimeStream/discussions)**
+
+<br/>
+
+---
+
+Made with ❤️ by **[Devanshu Patil](https://github.com/devanshupatil)**
 
 </div>
