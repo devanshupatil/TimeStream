@@ -6,13 +6,26 @@ const Database = require('better-sqlite3');
 const { extractSession, saveSession } = require('../importers/opencode.js');
 
 const OPENCODE_DB = path.join(os.homedir(), '.local', 'share', 'opencode', 'opencode.db');
-const SNAP_CODE_DB = '/home/devanshu/snap/code/228/.local/share/opencode/opencode.db';
-const SNAP_CODE_227_DB = '/home/devanshu/snap/code/227/.local/share/opencode/opencode.db';
+const SNAP_CODE_CURRENT_DB = path.join(os.homedir(), 'snap', 'code', 'current', '.local', 'share', 'opencode', 'opencode.db');
 const POLL_INTERVAL_MS = 3000;
 
 function getAllDBs() {
-  const paths = [OPENCODE_DB, SNAP_CODE_DB, SNAP_CODE_227_DB];
-  return paths.filter(p => fs.existsSync(p));
+  const paths = [
+    OPENCODE_DB,
+    SNAP_CODE_CURRENT_DB
+  ];
+  try {
+    const snapCodeDir = path.join(os.homedir(), 'snap', 'code');
+    if (fs.existsSync(snapCodeDir)) {
+      const dirs = fs.readdirSync(snapCodeDir, { withFileTypes: true });
+      for (const d of dirs) {
+        if (d.isDirectory() && !isNaN(parseInt(d.name))) {
+          paths.push(path.join(snapCodeDir, d.name, '.local', 'share', 'opencode', 'opencode.db'));
+        }
+      }
+    }
+  } catch (err) { }
+  return [...new Set(paths)].filter(p => fs.existsSync(p));
 }
 
 function startWatcher({ storageFile, onSession, onMissingDir }) {
@@ -25,8 +38,8 @@ function startWatcher({ storageFile, onSession, onMissingDir }) {
   }
 
   const dbs = dbPaths.map(p => new Database(p, { readonly: true }));
-  // First run: get last 24 hours of sessions, then switch to incremental mode
-  let lastCheckTime = Date.now() - 86400000; // 24 hours in ms
+  // First run: get last 30 days of sessions, then switch to incremental mode
+  let lastCheckTime = Date.now() - (30 * 86400000); // 30 days in ms
   let firstRun = true;
 
   const poll = () => {
