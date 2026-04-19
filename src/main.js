@@ -375,24 +375,28 @@ app.whenReady().then(() => {
         },
     });
 
-    const claudeProjectsDir = path.join(os.homedir(), '.claude', 'projects');
-    const allScanned = scanAll(claudeProjectsDir);
-    // Reset and repopulate with full scan
-    fs.writeFileSync(CLAUDE_FILE, JSON.stringify([]));
-    for (const session of allScanned) saveSession(session, CLAUDE_FILE);
+    // Run the heavy synchronous scanning after the window is created so the UI doesn't appear frozen
+    setTimeout(() => {
+        try {
+            const claudeProjectsDir = path.join(os.homedir(), '.claude', 'projects');
+            const allScanned = scanAll(claudeProjectsDir);
+            fs.writeFileSync(CLAUDE_FILE, JSON.stringify(allScanned, null, 2));
 
-    const claudeWatcher = createClaudeCliWatcher({
-        watchDir: claudeProjectsDir,
-        storageFile: CLAUDE_FILE,
-        onSession: (session) => {
-            if (mainWindow && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send('claude-session-updated', session);
-            }
-        },
-    });
-    claudeWatcher.start();
-
-    app.on('before-quit', () => claudeWatcher.stop());
+            const claudeWatcher = createClaudeCliWatcher({
+                watchDir: claudeProjectsDir,
+                storageFile: CLAUDE_FILE,
+                onSession: (session) => {
+                    if (mainWindow && !mainWindow.isDestroyed()) {
+                        mainWindow.webContents.send('claude-session-updated', session);
+                    }
+                },
+            });
+            claudeWatcher.start();
+            app.on('before-quit', () => claudeWatcher.stop());
+        } catch (e) {
+            console.error('Startup scan error:', e);
+        }
+    }, 1000);
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
