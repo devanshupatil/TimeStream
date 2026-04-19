@@ -33,7 +33,10 @@
         "AppImage",
         "deb"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "executableArgs": [
+        "--no-sandbox"
+      ]
     },
     "deb": {
       "depends": [
