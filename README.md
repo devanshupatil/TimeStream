@@ -141,7 +141,7 @@ Score < 3  →  ❌ Silently ignored
 
 ---
 
-## � App Gallery
+## 🖼️ App Gallery
 
 <table>
   <tr>
@@ -180,7 +180,13 @@ Score < 3  →  ❌ Silently ignored
 
 ---
 
-## �🚀 Get Started in 5 Minutes
+## 🚀 Get Started in 5 Minutes
+
+### Prerequisites
+- **OS:** Linux (Ubuntu 20.04+ / Debian-based recommended)
+- **Node.js:** v18 or higher
+- **npm:** v8 or higher
+- **Build tools:** `sudo apt install build-essential` (required for native modules)
 
 ### Step 1 — Clone & Install
 
@@ -243,7 +249,7 @@ TimeStream is now active. Open GitHub, watch a tutorial, chat with AI — your t
 
 | Layer | Technology | Why |
 |-------|-----------|-----|
-| Desktop | **Electron 41** | Cross-platform native app |
+| Desktop | **Electron 41** | Linux-first native app |
 | Extension | **Manifest V3** (Chrome + Firefox) | Secure, modern extension API |
 | File Watching | **chokidar 5** | Reliable cross-platform FS events |
 | Local DB | **better-sqlite3** | Fast, zero-config embedded SQL |
@@ -274,6 +280,14 @@ npm run build             # → Both
 - [ ] 💻 **VS Code extension** — track files and features you touch
 - [ ] 🍅 **Pomodoro integration** — link focus sessions to activities
 - [ ] 🌍 **Multi-language support**
+
+<br/>
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute. See [LICENSE](LICENSE) for details.
 
 <br/>
 
