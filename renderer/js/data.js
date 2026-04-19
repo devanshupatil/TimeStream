@@ -81,4 +81,5 @@ function search(query) {
     );
 }
 
-window.TSData = { getTodayActivities, getTimelineEntries, getStats, search, ACTIVITIES };
+window.TSData = { getTodayActivities, getTimelineEntries, getStats, search, ACTIVITIES, formatLearningTime };
+
