@@ -141,7 +141,46 @@ Score < 3  →  ❌ Silently ignored
 
 ---
 
-## 🚀 Get Started in 5 Minutes
+## � App Gallery
+
+<table>
+  <tr>
+    <td width="50%">
+      <b>Dashboard</b><br/>
+      <img src="docs/screenshots/dashboard.png" alt="Dashboard"/>
+    </td>
+    <td width="50%">
+      <b>Timeline</b><br/>
+      <img src="docs/screenshots/timeline.png" alt="Timeline"/>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <b>Analytics</b><br/>
+      <img src="docs/screenshots/analytics.png" alt="Analytics View"/>
+    </td>
+    <td width="50%">
+      <b>Learnings (AI Sessions)</b><br/>
+      <img src="docs/screenshots/learnings.png" alt="Learnings View"/>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <b>Search</b><br/>
+      <img src="docs/screenshots/search.png" alt="Search View"/>
+    </td>
+    <td width="50%">
+      <b>Sources</b><br/>
+      <img src="docs/screenshots/sources.png" alt="Sources View"/>
+    </td>
+  </tr>
+</table>
+
+<br/>
+
+---
+
+## �🚀 Get Started in 5 Minutes
 
 ### Step 1 — Clone & Install
 
