@@ -15,10 +15,16 @@
     return s > 0 ? `${m}m ${s}s` : `${m}m`;
   }
 
-  function formatTime(timeStr) {
-    if (!timeStr) return '';
-    const [h, m] = timeStr.split(':');
-    const hr = parseInt(h);
+  function formatTime(session) {
+    if (!session || !session.startTime) return '';
+    try {
+      const d = new Date(`${session.date}T${session.startTime}Z`);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase().replace(' ', '');
+      }
+    } catch (e) { }
+    const [h, m] = session.startTime.split(':');
+    const hr = parseInt(h, 10);
     return `${hr % 12 || 12}:${m}${hr < 12 ? 'am' : 'pm'}`;
   }
 
@@ -50,7 +56,7 @@
     const errCount = session.errors?.length || 0;
     const fixedCount = session.errorsFixed || 0;
     const duration = formatDuration(session.durationSecs);
-    const startTime = formatTime(session.startTime);
+    const startTime = formatTime(session);
 
     const durationHTML = duration
       ? `<span style="color:var(--text-secondary);font-size:12px">⏱ ${duration}</span>`
