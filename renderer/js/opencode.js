@@ -16,9 +16,15 @@
         return `${MONTHS[m - 1]} ${d}, ${y}`;
     }
 
-    function formatTime(timeStr) {
-        if (!timeStr) return '';
-        const [h, min] = timeStr.split(':');
+    function formatTime(session) {
+        if (!session || !session.startTime) return '';
+        try {
+            const d = new Date(`${session.date}T${session.startTime}Z`);
+            if (!isNaN(d.getTime())) {
+                return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            }
+        } catch (e) { }
+        const [h, min] = session.startTime.split(':');
         const hour = parseInt(h, 10);
         const ampm = hour >= 12 ? 'PM' : 'AM';
         return `${hour % 12 || 12}:${min} ${ampm}`;
@@ -82,7 +88,7 @@
         return `
         <div class="oc-session-card" style="cursor:pointer;" onclick="window.openOpencodeModal('${session.sessionId}')">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-                <div class="oc-session-time">${formatTime(session.startTime)}</div>
+                <div class="oc-session-time">${formatTime(session)}</div>
                 ${sourceBadge}
             </div>
             <div class="oc-session-title">${escHtml(session.title || '')}</div>
