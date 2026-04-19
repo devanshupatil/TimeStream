@@ -878,173 +878,44 @@
             <!-- Bar Chart -->
             <div class="stat-card" style="margin-bottom:20px">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-                    <h3 style="font-weight:700;color:var(--text-primary)">Weekly Activity</h3>
+                    <h3 style="font-weight:700;color:var(--text-primary)" id="an-bar-title">Weekly Activity</h3>
                     <div style="display:flex;gap:6px">
-                        <button
+                        <button id="an-btn-week"
                             style="padding:6px 14px;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(43, 212, 189, 0.2)">Week</button>
-                        <button
+                        <button id="an-btn-month"
                             style="padding:6px 14px;border-radius:8px;background:var(--card-bg);color:var(--text-secondary);font-size:12px;cursor:pointer;border:1px solid var(--border)">Month</button>
                     </div>
                 </div>
-
-                <div style="display:flex;align-items:flex-end;gap:10px;height:120px">
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div class="bar" style="height:60%;margin-top:auto"></div><span
-                            style="font-size:11px;color:#64748b">Mon</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div class="bar" style="height:90%;margin-top:auto"></div><span
-                            style="font-size:11px;color:#64748b">Tue</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div class="bar" style="height:40%;margin-top:auto;opacity:.6"></div><span
-                            style="font-size:11px;color:#64748b">Wed</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div class="bar" style="height:75%;margin-top:auto;opacity:.8"></div><span
-                            style="font-size:11px;color:#64748b">Thu</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div class="bar" style="height:100%;margin-top:auto"></div><span
-                            style="font-size:11px;color:var(--accent);font-weight:700">Today</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div
-                            style="border-radius:4px 4px 0 0;width:100%;height:20%;margin-top:auto;background:var(--border)">
-                        </div><span style="font-size:11px;color:var(--text-secondary)">Sat</span>
-                    </div>
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%">
-                        <div
-                            style="border-radius:4px 4px 0 0;width:100%;height:10%;margin-top:auto;background:var(--border)">
-                        </div><span style="font-size:11px;color:var(--text-secondary)">Sun</span>
-                    </div>
-                </div>
+                <div id="analytics-bar-chart" style="display:flex;align-items:flex-end;gap:8px;height:120px"></div>
             </div>
 
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
                 <!-- Categories -->
                 <div class="stat-card">
                     <h3 style="font-weight:700;color:var(--text-primary);margin-bottom:20px">Activity Categories</h3>
-
-                    <div style="display:flex;flex-direction:column;gap:14px">
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                    style="font-size:13px;color:var(--text-secondary)">🟢 Coding</span><span
-                                    style="font-size:13px;font-weight:700;color:#0d9488">42%</span></div>
-                            <div class="progress">
-                                <div class="progress-fill" style="width:42%;background:#0d9488"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                    style="font-size:13px;color:var(--text-secondary)">🔵 Learning</span><span
-                                    style="font-size:13px;font-weight:700;color:#2bd4bd">31%</span></div>
-                            <div class="progress">
-                                <div class="progress-fill" style="width:31%;background:#2bd4bd"></div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                    style="font-size:13px;color:var(--text-secondary)">🟣 Research</span><span
-                                    style="font-size:13px;font-weight:700;color:#24b4c6">18%</span></div>
-                            <div class="progress">
-                                <div class="progress-fill" style="width:18%;background:#24b4c6"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                    style="font-size:13px;color:var(--text-secondary)">🔷 DevOps</span><span
-                                    style="font-size:13px;font-weight:700;color:#10b981">9%</span></div>
-                            <div class="progress">
-                                <div class="progress-fill" style="width:9%;background:#10b981"></div>
-                            </div>
-                        </div>
-
-
-                    </div>
+                    <div id="analytics-categories" style="display:flex;flex-direction:column;gap:14px"></div>
                 </div>
                 <!-- Top Sources -->
                 <div class="stat-card">
                     <h3 style="font-weight:700;color:var(--text-primary);margin-bottom:20px">Top Sources</h3>
-
-                    <div style="display:flex;flex-direction:column;gap:16px">
-                        <div style="display:flex;align-items:center;gap:14px">
-                            <div
-                                style="width:40px;height:40px;border-radius:10px;background:#0f172a;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                                <span class="material-symbols-outlined">code_blocks</span>
-                            </div>
-                            <div style="flex:1">
-                                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                        style="font-size:13px;font-weight:600">GitHub</span><span
-                                        style="font-size:13px;font-weight:700;color:#34d399">14 events</span></div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width:90%;background:#10b981"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:14px">
-                            <div
-                                style="width:40px;height:40px;border-radius:10px;background:#24b4c6;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-
-                                <span class="material-symbols-outlined">code</span>
-                            </div>
-                            <div style="flex:1">
-                                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                        style="font-size:13px;font-weight:600">VS Code</span><span
-                                        style="font-size:13px;font-weight:700;color:#24b4c6">8 sessions</span></div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width:55%;background:#24b4c6"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:14px">
-                            <div
-                                style="width:40px;height:40px;border-radius:10px;background:#dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                                <span class="material-symbols-outlined">smart_display</span>
-                            </div>
-                            <div style="flex:1">
-                                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                        style="font-size:13px;font-weight:600">YouTube</span><span
-                                        style="font-size:13px;font-weight:700;color:#f87171">5 videos</span></div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width:35%;background:#ef4444"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:14px">
-                            <div
-                                style="width:40px;height:40px;border-radius:10px;background:#d97706;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                                <span class="material-symbols-outlined">language</span>
-                            </div>
-                            <div style="flex:1">
-                                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span
-                                        style="font-size:13px;font-weight:600">Browser</span><span
-                                        style="font-size:13px;font-weight:700;color:#fbbf24">3 articles</span></div>
-                                <div class="progress">
-                                    <div class="progress-fill" style="width:20%;background:#f59e0b"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <div id="analytics-top-sources" style="display:flex;flex-direction:column;gap:16px"></div>
                 </div>
             </div>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
                 <div class="stat-card" style="text-align:center">
-                    <p style="font-size:28px;font-weight:800;color:var(--text-primary)">38</p>
+                    <p id="an-total" style="font-size:28px;font-weight:800;color:var(--text-primary)">—</p>
                     <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Total Activities</p>
                 </div>
                 <div class="stat-card" style="text-align:center">
-                    <p style="font-size:28px;font-weight:800;color:var(--text-primary)">6.5h</p>
+                    <p id="an-avg-daily" style="font-size:28px;font-weight:800;color:var(--text-primary)">—</p>
                     <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Avg Daily Learning</p>
                 </div>
                 <div class="stat-card" style="text-align:center">
-                    <p style="font-size:28px;font-weight:800;color:var(--text-primary)">12</p>
+                    <p id="an-streak" style="font-size:28px;font-weight:800;color:var(--text-primary)">—</p>
                     <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Day Streak</p>
                 </div>
                 <div class="stat-card" style="text-align:center">
-                    <p style="font-size:28px;font-weight:800;color:var(--text-primary)">4</p>
+                    <p id="an-sources" style="font-size:28px;font-weight:800;color:var(--text-primary)">—</p>
                     <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Active Sources</p>
                 </div>
             </div>
@@ -1428,6 +1299,7 @@
             if (target === 'dashboard') renderDashboard();
             if (target === 'timeline') renderTimeline();
             if (target === 'search') renderSearch('');
+            if (target === 'analytics') renderAnalytics();
         }
 
         document.querySelectorAll('[data-nav]').forEach(l => {
@@ -1479,6 +1351,202 @@
             const color = browser === 'Firefox' ? 'background:rgba(255,145,0,0.15);color:#ff9100' : 'background:rgba(66,133,244,0.15);color:#4285f4';
             return `<span class="badge" style="${color};margin-left:6px">${browser}</span>`;
         }
+
+        // ── ANALYTICS ─────────────────────────────────────────────
+        let anBarMode = 'week'; // 'week' | 'month'
+
+        // Source styling config
+        const SOURCE_STYLE = {
+            youtube: { icon: 'smart_display', bg: '#dc2626', color: '#f87171' },
+            github: { icon: 'code_blocks', bg: '#1a3a1a', color: '#34d399' },
+            reddit: { icon: 'forum', bg: '#ff4500', color: '#fb923c' },
+            chatgpt: { icon: 'psychology', bg: '#10a37f', color: '#6ee7b7' },
+            claude: { icon: 'psychology_alt', bg: '#c97a3c', color: '#fdba74' },
+            perplexity: { icon: 'search', bg: '#6c47ff', color: '#c4b5fd' },
+            qwen: { icon: 'smart_toy', bg: '#0055ff', color: '#93c5fd' },
+        };
+
+        const CAT_STYLE = {
+            'Coding': { emoji: '🟢', color: '#0d9488' },
+            'Learning': { emoji: '🔵', color: '#2bd4bd' },
+            'Research': { emoji: '🟣', color: '#24b4c6' },
+            'DevOps': { emoji: '🔷', color: '#10b981' },
+            'Other': { emoji: '⬜', color: '#64748b' },
+        };
+
+        function renderAnalyticsBarChart(days) {
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            const labels = [];
+            const counts = [];
+            for (let i = days - 1; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dStr = d.toLocaleDateString('en-CA');
+                const count = window.TSData.ACTIVITIES.filter(a => {
+                    const raw = a.time || a.timestamp;
+                    if (!raw) return false;
+                    return new Date(raw).toLocaleDateString('en-CA') === dStr;
+                }).length;
+                counts.push(count);
+                if (days <= 7) {
+                    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    labels.push(dStr === todayStr ? 'Today' : dayNames[d.getDay()]);
+                } else {
+                    labels.push(i === 0 ? 'Today' : `${d.getMonth() + 1}/${d.getDate()}`);
+                }
+            }
+
+            const maxCount = Math.max(...counts, 1);
+            const container = document.getElementById('analytics-bar-chart');
+            if (!container) return;
+
+            container.style.gap = days > 7 ? '4px' : '8px';
+            container.innerHTML = counts.map((c, i) => {
+                const isToday = labels[i] === 'Today';
+                const pct = Math.max((c / maxCount) * 100, c > 0 ? 8 : 2);
+                const barBg = c === 0 ? 'var(--border)' : (isToday ? 'var(--accent)' : 'var(--accent)');
+                const barOpacity = c === 0 ? '1' : (isToday ? '1' : '0.65');
+                const labelColor = isToday ? 'var(--accent)' : 'var(--text-secondary)';
+                const labelWeight = isToday ? '700' : '400';
+                return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;min-width:0">
+                    <span style="font-size:10px;color:var(--text-secondary);opacity:${c > 0 ? 1 : 0}">${c}</span>
+                    <div style="border-radius:4px 4px 0 0;width:100%;height:${pct}%;margin-top:auto;background:${barBg};opacity:${barOpacity};transition:height .5s cubic-bezier(.22,.61,.36,1)"></div>
+                    <span style="font-size:${days > 14 ? '9px' : '11px'};color:${labelColor};font-weight:${labelWeight};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center">${labels[i]}</span>
+                </div>`;
+            }).join('');
+        }
+
+        async function renderAnalytics() {
+            const acts = window.TSData.ACTIVITIES;
+
+            // ── Bar chart ──
+            renderAnalyticsBarChart(anBarMode === 'week' ? 7 : 30);
+
+            // ── Categories ──
+            const catCounts = {};
+            acts.forEach(a => {
+                const cat = a.category || 'Other';
+                catCounts[cat] = (catCounts[cat] || 0) + 1;
+            });
+            const total = acts.length || 1;
+            const catEl = document.getElementById('analytics-categories');
+            if (catEl) {
+                const sorted = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
+                if (sorted.length === 0) {
+                    catEl.innerHTML = `<p style="color:var(--text-secondary);font-size:13px">No data yet. Start tracking!</p>`;
+                } else {
+                    catEl.innerHTML = sorted.map(([cat, count]) => {
+                        const pct = Math.round((count / total) * 100);
+                        const s = CAT_STYLE[cat] || CAT_STYLE['Other'];
+                        return `<div>
+                            <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                                <span style="font-size:13px;color:var(--text-secondary)">${s.emoji} ${cat}</span>
+                                <span style="font-size:13px;font-weight:700;color:${s.color}">${pct}%</span>
+                            </div>
+                            <div class="progress"><div class="progress-fill" style="width:${pct}%;background:${s.color};transition:width .5s ease"></div></div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+
+            // ── Top Sources ──
+            const srcCounts = {};
+            acts.forEach(a => {
+                const key = a.source || 'other';
+                if (!srcCounts[key]) srcCounts[key] = { label: a.sourceLabel || key, count: 0 };
+                srcCounts[key].count++;
+            });
+            const srcSorted = Object.entries(srcCounts).sort((a, b) => b[1].count - a[1].count).slice(0, 5);
+            const maxSrc = srcSorted[0]?.[1].count || 1;
+            const srcEl = document.getElementById('analytics-top-sources');
+            if (srcEl) {
+                if (srcSorted.length === 0) {
+                    srcEl.innerHTML = `<p style="color:var(--text-secondary);font-size:13px">No data yet.</p>`;
+                } else {
+                    srcEl.innerHTML = srcSorted.map(([srcId, { label, count }]) => {
+                        const s = SOURCE_STYLE[srcId] || { icon: 'language', bg: '#334155', color: '#94a3b8' };
+                        const pct = Math.round((count / maxSrc) * 100);
+                        return `<div style="display:flex;align-items:center;gap:14px">
+                            <div style="width:40px;height:40px;border-radius:10px;background:${s.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                                <span class="material-symbols-outlined" style="color:#fff;font-size:20px">${s.icon}</span>
+                            </div>
+                            <div style="flex:1;min-width:0">
+                                <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                                    <span style="font-size:13px;font-weight:600">${label}</span>
+                                    <span style="font-size:13px;font-weight:700;color:${s.color}">${count} items</span>
+                                </div>
+                                <div class="progress"><div class="progress-fill" style="width:${pct}%;background:${s.color};transition:width .5s ease"></div></div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+
+            // ── Stat cards ──
+            const totalEl = document.getElementById('an-total');
+            if (totalEl) totalEl.textContent = acts.length;
+
+            const sourcesEl = document.getElementById('an-sources');
+            if (sourcesEl) sourcesEl.textContent = Object.keys(srcCounts).length;
+
+            // Streak: consecutive days with ≥1 activity going back from today
+            const todayStr = new Date().toLocaleDateString('en-CA');
+            const datesWithActivity = new Set(acts.map(a => {
+                const raw = a.time || a.timestamp;
+                return raw ? new Date(raw).toLocaleDateString('en-CA') : null;
+            }).filter(Boolean));
+
+            let streak = 0;
+            let checkDate = new Date();
+            while (true) {
+                const ds = checkDate.toLocaleDateString('en-CA');
+                if (datesWithActivity.has(ds)) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            const streakEl = document.getElementById('an-streak');
+            if (streakEl) streakEl.textContent = streak > 0 ? `${streak}d` : '0d';
+
+            // Avg daily learning
+            const avgDailyEl = document.getElementById('an-avg-daily');
+            if (avgDailyEl && window.electronAPI?.getLearningSeconds) {
+                try {
+                    const allSeconds = await window.electronAPI.getLearningSeconds();
+                    const dateTotals = Object.values(allSeconds);
+                    if (dateTotals.length > 0) {
+                        const avgSec = dateTotals.reduce((s, v) => s + v, 0) / dateTotals.length;
+                        avgDailyEl.textContent = window.TSData.formatLearningTime
+                            ? window.TSData.formatLearningTime(Math.round(avgSec))
+                            : (avgSec >= 3600 ? (avgSec / 3600).toFixed(1) + 'h' : Math.round(avgSec / 60) + 'm');
+                    } else {
+                        avgDailyEl.textContent = '0m';
+                    }
+                } catch (e) {
+                    avgDailyEl.textContent = '—';
+                }
+            } else if (avgDailyEl) {
+                avgDailyEl.textContent = '0m';
+            }
+        }
+
+        // Wire up Week / Month toggle
+        document.getElementById('an-btn-week')?.addEventListener('click', () => {
+            anBarMode = 'week';
+            document.getElementById('an-btn-week').style.cssText = 'padding:6px 14px;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(43,212,189,0.2)';
+            document.getElementById('an-btn-month').style.cssText = 'padding:6px 14px;border-radius:8px;background:var(--card-bg);color:var(--text-secondary);font-size:12px;cursor:pointer;border:1px solid var(--border)';
+            document.getElementById('an-bar-title').textContent = 'Weekly Activity';
+            renderAnalyticsBarChart(7);
+        });
+        document.getElementById('an-btn-month')?.addEventListener('click', () => {
+            anBarMode = 'month';
+            document.getElementById('an-btn-month').style.cssText = 'padding:6px 14px;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(43,212,189,0.2)';
+            document.getElementById('an-btn-week').style.cssText = 'padding:6px 14px;border-radius:8px;background:var(--card-bg);color:var(--text-secondary);font-size:12px;cursor:pointer;border:1px solid var(--border)';
+            document.getElementById('an-bar-title').textContent = 'Monthly Activity';
+            renderAnalyticsBarChart(30);
+        });
 
         // ── DASHBOARD ─────────────────────────────────────────────
         async function renderDashboard() {
