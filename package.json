@@ -17,7 +17,8 @@
     "test": "node --test tests/",
     "build": "electron-builder --linux",
     "build:deb": "electron-builder --linux deb",
-    "build:appimage": "electron-builder --linux AppImage"
+    "build:appimage": "electron-builder --linux AppImage",
+    "build:win": "electron-builder --win"
   },
   "build": {
     "appId": "com.timestream.app",
@@ -36,6 +37,11 @@
       "category": "Utility",
       "executableArgs": [
         "--no-sandbox"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
       ]
     },
     "deb": {
