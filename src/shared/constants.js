@@ -83,6 +83,7 @@ const DEFAULT_AGENT_CONFIG = {
       browsers: ['chrome', 'firefox'],
       historyLimit: 100,
       pollIntervalMs: 60000,
+      excludedDomains: [],
     },
   },
   database: {
