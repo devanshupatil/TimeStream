@@ -596,6 +596,30 @@
             color: #f87171;
             background: rgba(248, 113, 113, 0.08);
         }
+
+        .av-option {
+            width: 100%; aspect-ratio: 1; border-radius: 50%;
+            border: 2px solid var(--border); display: flex;
+            align-items: center; justify-content: center;
+            font-size: 28px; cursor: pointer; transition: all .15s;
+            background: var(--card-bg);
+        }
+        .av-option:hover { border-color: var(--accent); transform: scale(1.05); }
+        .av-option.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(43,212,189,0.25); }
+
+        .browser-chip {
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            cursor: pointer; border: 1px solid var(--border); color: var(--text-secondary);
+            background: transparent; transition: all .15s; user-select: none;
+        }
+        .browser-chip.active { background: rgba(43,212,189,0.12); color: var(--accent); border-color: var(--accent); }
+
+        .exclusion-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px;
+        }
+        .exclusion-domain { font-size: 13px; color: #94a3b8; font-family: monospace; }
+        .exclusion-remove { color: #f87171; font-size: 18px; cursor: pointer; background: none; border: none; line-height: 1; padding: 0 4px; }
     </style>
 </head>
 
@@ -641,9 +665,10 @@
                 <span class="material-symbols-outlined" style="color:#fff">timeline</span>
             </div>
             <div>
-                <div style="font-size:15px;font-weight:700;color:var(--text-primary);letter-spacing: 0.02em">Devanshu
+                <div id="sidebar-profile-name"
+                    style="font-size:15px;font-weight:700;color:var(--text-primary);letter-spacing: 0.02em">Devanshu
                 </div>
-                <div
+                <div id="sidebar-profile-role"
                     style="font-size:10px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.1em;font-weight:600">
                     Developer</div>
             </div>
@@ -1085,6 +1110,32 @@
                 <p style="color:var(--text-secondary);margin-bottom:32px">Configure your app behavior and appearance.
                 </p>
 
+                <!-- ── PROFILE HEADER ── -->
+                <div style="background:linear-gradient(135deg,var(--card-bg) 0%,#0f1f35 100%);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;align-items:center;gap:20px;margin-bottom:32px">
+                    <div style="position:relative;cursor:pointer;flex-shrink:0" id="settings-avatar-btn" title="Click to change avatar">
+                        <div id="settings-avatar-display" style="width:72px;height:72px;border-radius:50%;border:3px solid var(--accent);background:var(--card-bg);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 0 4px rgba(43,212,189,0.15)">🦊</div>
+                        <div style="position:absolute;bottom:2px;right:2px;width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#0a0f1e;font-weight:700;border:2px solid var(--bg)">✏</div>
+                    </div>
+                    <div style="flex:1">
+                        <input id="settings-display-name" maxlength="32" placeholder="Your name"
+                            style="font-size:20px;font-weight:800;color:var(--text-primary);background:transparent;border:none;outline:none;width:100%;letter-spacing:-0.01em"/>
+                        <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Click your avatar to change it</p>
+                        <span style="background:rgba(43,212,189,0.12);color:var(--accent);font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;display:inline-block;margin-top:8px">Developer</span>
+                    </div>
+                </div>
+
+                <!-- ── AVATAR MODAL ── -->
+                <div id="avatar-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)">
+                    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:24px;width:340px;max-width:95vw">
+                        <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:4px">Choose your avatar</h3>
+                        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">Pick an anime character that represents you</p>
+                        <div id="avatar-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px"></div>
+                        <div style="display:flex;gap:8px;justify-content:flex-end">
+                            <button id="avatar-modal-cancel" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+                            <button id="avatar-modal-save" style="background:var(--accent);color:#0a0f1e;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer">Save</button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- ── APPEARANCE MODE ── -->
                 <div style="margin-bottom:32px">
@@ -1117,142 +1168,233 @@
                     </div>
                 </div>
 
-            </div>
 
-
-
-            <div style="margin-bottom:28px">
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-                    <span class="material-symbols-outlined" style="color:var(--accent)">power_settings_new</span>
-                    <h3 style="font-size:16px;font-weight:700;color:var(--text-primary)">Startup Behavior</h3>
-                </div>
-
-                <div style="display:flex;flex-direction:column;gap:10px">
-                    <div
-                        style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)">
-                        <div style="display:flex;align-items:center;gap:14px">
-                            <div
-                                style="width:40px;height:40px;border-radius:50%;background:rgba(43,212,189,.1);display:flex;align-items:center;justify-content:center">
-                                <span class="material-symbols-outlined" style="color:var(--accent)">launch</span>
-                            </div>
-
-                            <div>
-                                <p style="font-weight:600;color:var(--text-primary)">Launch on Login</p>
-                                <p style="font-size:12px;color:var(--text-secondary);margin-top:2px">Auto-start
-                                    TimeStream when
-                                    you log in.</p>
-                            </div>
-
-                        </div>
-                        <label style="position:relative;display:flex;width:48px;height:28px;cursor:pointer">
-                            <input type="checkbox" style="opacity:0;width:0;height:0;position:absolute"
-                                onchange="toggleSwitch(this)" />
-                            <div class="sw-track"
-                                style="position:absolute;inset:0;background:#334155;border-radius:9999px;transition:.3s">
-                                <div class="sw-thumb"
-                                    style="position:absolute;left:4px;top:4px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s">
-                                </div>
-                            </div>
-                        </label>
+                <!-- ── ACCENT COLOR ── -->
+                <div style="margin-bottom:32px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                        <span class="material-symbols-outlined" style="color:var(--accent)">palette</span>
+                        <h3 style="font-size:16px;font-weight:700;color:var(--text-primary)">Accent Color</h3>
                     </div>
                     <div
-                        style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)">
-                        <div style="display:flex;align-items:center;gap:14px">
-                            <div
-                                style="width:40px;height:40px;border-radius:50%;background:rgba(43,212,189,.1);display:flex;align-items:center;justify-content:center">
-                                <span class="material-symbols-outlined" style="color:var(--accent)">minimize</span>
-                            </div>
-
-                            <div>
-                                <p style="font-weight:600;color:var(--text-primary)">Start Minimized</p>
-                                <p style="font-size:12px;color:var(--text-secondary);margin-top:2px">Open in system tray
-                                    without
-                                    main window.</p>
-                            </div>
-
-                        </div>
-                        <label style="position:relative;display:flex;width:48px;height:28px;cursor:pointer">
-                            <input type="checkbox" checked style="opacity:0;width:0;height:0;position:absolute"
-                                onchange="toggleSwitch(this)" />
-                            <div class="sw-track"
-                                style="position:absolute;inset:0;background:var(--accent);border-radius:9999px;transition:.3s">
-                                <div class="sw-thumb"
-                                    style="position:absolute;left:4px;top:4px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;transform:translateX(20px)">
-                                </div>
-                            </div>
-                        </label>
+                        style="display:flex;gap:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm)">
+                        <button class="color-swatch active" onclick="setAccent('#2bd4bd', this)"
+                            style="width:36px;height:36px;border-radius:50%;background:#2bd4bd;border:none;cursor:pointer;position:relative;box-shadow:0 0 0 2px var(--bg), 0 0 0 4px #2bd4bd;transition:all 0.2s"></button>
+                        <button class="color-swatch" onclick="setAccent('#3b82f6', this)"
+                            style="width:36px;height:36px;border-radius:50%;background:#3b82f6;border:none;cursor:pointer;position:relative;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:all 0.2s"></button>
+                        <button class="color-swatch" onclick="setAccent('#8b5cf6', this)"
+                            style="width:36px;height:36px;border-radius:50%;background:#8b5cf6;border:none;cursor:pointer;position:relative;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:all 0.2s"></button>
+                        <button class="color-swatch" onclick="setAccent('#f43f5e', this)"
+                            style="width:36px;height:36px;border-radius:50%;background:#f43f5e;border:none;cursor:pointer;position:relative;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:all 0.2s"></button>
+                        <button class="color-swatch" onclick="setAccent('#f59e0b', this)"
+                            style="width:36px;height:36px;border-radius:50%;background:#f59e0b;border:none;cursor:pointer;position:relative;box-shadow:0 2px 4px rgba(0,0,0,0.1);transition:all 0.2s"></button>
                     </div>
                 </div>
-            </div>
 
+                <!-- ── DAILY GOAL ── -->
+                <div style="margin-bottom:32px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                        <span class="material-symbols-outlined" style="color:var(--accent)">flag</span>
+                        <h3 style="font-size:16px;font-weight:700;color:var(--text-primary)">Daily Learning Goal</h3>
+                    </div>
+                    <div
+                        style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow-sm)">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+                            <span style="font-size:14px;color:var(--text-primary);font-weight:600">Target Hours</span>
+                            <span id="goal-value-display" style="font-size:14px;color:var(--accent);font-weight:700">4
+                                Hours</span>
+                        </div>
+                        <input type="range" id="goal-slider" min="1" max="12" value="4"
+                            oninput="updateGoalDisplay(this.value)" onchange="saveGoal(this.value)"
+                            style="width:100%;accent-color:var(--accent);cursor:pointer">
+                        <div
+                            style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--text-secondary)">
+                            <span>1 hr</span>
+                            <span>12 hrs</span>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- ── DATA ── -->
-            <div style="padding-top:24px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:10px">
-                <button
-                    style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer">
-                    <span class="material-symbols-outlined"
-                        style="font-size:16px;color:var(--text-secondary)">download</span>Export
-                    CSV</button>
-                <button
-                    style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer">
-                    <span class="material-symbols-outlined"
-                        style="font-size:16px;color:var(--text-secondary)">cloud_upload</span>Manual Backup</button>
-                <button id="btn-clear-history-app"
-                    style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid rgba(239,68,68,.3);border-radius:10px;background:transparent;color:#f87171;font-size:13px;font-weight:600;cursor:pointer;margin-left:auto">
-                    <span class="material-symbols-outlined" style="font-size:16px">delete_forever</span>Clear
-                    History</button>
-            </div>
+                <!-- ── TRACKING & PRIVACY ── -->
+                <div style="margin-bottom:32px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                        <span class="material-symbols-outlined" style="color:var(--accent)">privacy_tip</span>
+                        <h3 style="font-size:16px;font-weight:700;color:var(--text-primary)">Privacy & Tracking</h3>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <div
+                            style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)">
+                            <div style="display:flex;align-items:center;gap:14px">
+                                <div
+                                    style="width:40px;height:40px;border-radius:50%;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center">
+                                    <span class="material-symbols-outlined" style="color:#ef4444">block</span>
+                                </div>
+                                <div>
+                                    <p style="font-weight:600;color:var(--text-primary)">Pause All Tracking</p>
+                                    <p style="font-size:12px;color:var(--text-secondary);margin-top:2px">Temporarily
+                                        stop recording activities (<span
+                                            style="color:#ef4444;font-weight:bold">Incognito</span>).</p>
+                                </div>
+                            </div>
+                            <label style="position:relative;display:flex;width:48px;height:28px;cursor:pointer">
+                                <input type="checkbox" id="setting-pause-tracking"
+                                    style="opacity:0;width:0;height:0;position:absolute"
+                                    onchange="togglePauseTracking(this)" />
+                                <div class="sw-track"
+                                    style="position:absolute;inset:0;background:#334155;border-radius:9999px;transition:.3s">
+                                    <div class="sw-thumb"
+                                        style="position:absolute;left:4px;top:4px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s">
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
 
-        </div>
+                        <div
+                            style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)">
+                            <div style="display:flex;align-items:center;gap:14px">
+                                <div
+                                    style="width:40px;height:40px;border-radius:50%;background:rgba(43,212,189,.1);display:flex;align-items:center;justify-content:center">
+                                    <span class="material-symbols-outlined" style="color:var(--accent)">sync</span>
+                                </div>
+                                <div>
+                                    <p style="font-weight:600;color:var(--text-primary)">Auto-Sync Frequency</p>
+                                    <p style="font-size:12px;color:var(--text-secondary);margin-top:2px">How often
+                                        external sources are polled.</p>
+                                </div>
+                            </div>
+                            <select id="setting-sync-freq" onchange="saveSyncFreq(this.value)"
+                                style="background:var(--bg);border:1px solid var(--border);color:var(--text-primary);padding:8px 12px;border-radius:6px;outline:none;cursor:pointer">
+                                <option value="1">Every 1 min</option>
+                                <option value="5" selected>Every 5 mins</option>
+                                <option value="15">Every 15 mins</option>
+                                <option value="manual">Manual only</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="page" data-page="opencode" id="page-opencode">
-            <div class="oc-header">
-                <h2>What I Learned Today</h2>
-                <div style="position:relative">
-                    <button id="btn-calendar-oc"
-                        style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:13px;font-weight:500;cursor:pointer;box-shadow:var(--shadow-sm)">
-                        <span class="material-symbols-outlined" style="font-size:16px">calendar_today</span>
-                        <span id="oc-date-label">Today</span>
+                <!-- ── NOTIFICATIONS ── -->
+                <div style="margin-bottom:32px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                        <span class="material-symbols-outlined" style="color:var(--accent)">notifications</span>
+                        <h3 style="font-size:16px;font-weight:700;color:var(--text-primary)">Notifications</h3>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <div
+                            style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm)">
+                            <div style="display:flex;align-items:center;gap:14px">
+                                <div
+                                    style="width:40px;height:40px;border-radius:50%;background:rgba(43,212,189,.1);display:flex;align-items:center;justify-content:center">
+                                    <span class="material-symbols-outlined"
+                                        style="color:var(--accent)">emoji_events</span>
+                                </div>
+                                <div>
+                                    <p style="font-weight:600;color:var(--text-primary)">Goal Achievements</p>
+                                    <p style="font-size:12px;color:var(--text-secondary);margin-top:2px">Get notified
+                                        when you hit your daily learning goal.</p>
+                                </div>
+                            </div>
+                            <label style="position:relative;display:flex;width:48px;height:28px;cursor:pointer">
+                                <input type="checkbox" checked id="setting-notify-goal"
+                                    style="opacity:0;width:0;height:0;position:absolute"
+                                    onchange="toggleNotifyGoal(this)" />
+                                <div class="sw-track"
+                                    style="position:absolute;inset:0;background:var(--accent);border-radius:9999px;transition:.3s">
+                                    <div class="sw-thumb"
+                                        style="position:absolute;left:4px;top:4px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.3s;transform:translateX(20px)">
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── DANGER ZONE ── -->
+                <div style="margin-bottom:28px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+                        <span class="material-symbols-outlined" style="color:#ef4444">warning</span>
+                        <h3 style="font-size:16px;font-weight:700;color:#ef4444">Danger Zone</h3>
+                    </div>
+                    <div
+                        style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:16px">
+                        <div style="display:flex;align-items:center;justify-content:space-between">
+                            <div>
+                                <p style="font-weight:600;color:var(--text-primary)">Clear Timeline History</p>
+                                <p style="font-size:12px;color:var(--text-secondary);margin-top:2px">Permanently delete
+                                    all activity tracking data.</p>
+                            </div>
+                            <button id="btn-clear-history-app"
+                                style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;color:#ef4444;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:16px">delete_forever</span>Clear Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── DATA EXPORT ── -->
+                <div style="padding-top:24px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:10px">
+                    <button
+                        style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer">
+                        <span class="material-symbols-outlined"
+                            style="font-size:16px;color:var(--text-secondary)">download</span>Export CSV
                     </button>
-                    <div id="oc-cal-dropdown">
-                        <div class="cal-header">
-                            <button class="cal-nav-btn" id="oc-cal-prev">
-                                <span class="material-symbols-outlined" style="font-size:15px">chevron_left</span>
-                            </button>
-                            <span class="cal-month-year" id="oc-cal-month-year"></span>
-                            <button class="cal-nav-btn" id="oc-cal-next">
-                                <span class="material-symbols-outlined" style="font-size:15px">chevron_right</span>
-                            </button>
-                        </div>
-                        <div class="cal-weekdays">
-                            <div class="cal-weekday">Su</div>
-                            <div class="cal-weekday">Mo</div>
-                            <div class="cal-weekday">Tu</div>
-                            <div class="cal-weekday">We</div>
-                            <div class="cal-weekday">Th</div>
-                            <div class="cal-weekday">Fr</div>
-                            <div class="cal-weekday">Sa</div>
-                        </div>
-                        <div class="cal-grid" id="oc-cal-grid"></div>
-                        <div class="cal-footer">
-                            <button class="cal-today-btn" id="oc-cal-today-btn">Today</button>
-                            <button class="cal-clear-btn" id="oc-cal-clear-btn">Clear</button>
+                    <button
+                        style="display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--text-primary);font-size:13px;font-weight:600;cursor:pointer">
+                        <span class="material-symbols-outlined"
+                            style="font-size:16px;color:var(--text-secondary)">cloud_upload</span>Manual Backup
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="opencode" id="page-opencode">
+                <div class="oc-header">
+                    <h2>What I Learned Today</h2>
+                    <div style="position:relative">
+                        <button id="btn-calendar-oc"
+                            style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:13px;font-weight:500;cursor:pointer;box-shadow:var(--shadow-sm)">
+                            <span class="material-symbols-outlined" style="font-size:16px">calendar_today</span>
+                            <span id="oc-date-label">Today</span>
+                        </button>
+                        <div id="oc-cal-dropdown">
+                            <div class="cal-header">
+                                <button class="cal-nav-btn" id="oc-cal-prev">
+                                    <span class="material-symbols-outlined" style="font-size:15px">chevron_left</span>
+                                </button>
+                                <span class="cal-month-year" id="oc-cal-month-year"></span>
+                                <button class="cal-nav-btn" id="oc-cal-next">
+                                    <span class="material-symbols-outlined" style="font-size:15px">chevron_right</span>
+                                </button>
+                            </div>
+                            <div class="cal-weekdays">
+                                <div class="cal-weekday">Su</div>
+                                <div class="cal-weekday">Mo</div>
+                                <div class="cal-weekday">Tu</div>
+                                <div class="cal-weekday">We</div>
+                                <div class="cal-weekday">Th</div>
+                                <div class="cal-weekday">Fr</div>
+                                <div class="cal-weekday">Sa</div>
+                            </div>
+                            <div class="cal-grid" id="oc-cal-grid"></div>
+                            <div class="cal-footer">
+                                <button class="cal-today-btn" id="oc-cal-today-btn">Today</button>
+                                <button class="cal-clear-btn" id="oc-cal-clear-btn">Clear</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <div class="oc-stats-bar" id="oc-stats-bar">
+                    <span><strong id="oc-total-sessions">0</strong> Sessions</span>
+                    <span><strong id="oc-total-errors">0</strong> Errors Fixed</span>
+                </div>
+
+                <div class="oc-sessions-list" id="oc-sessions-list">
+                    <!-- Cards injected by opencode.js -->
+                </div>
             </div>
 
-            <div class="oc-stats-bar" id="oc-stats-bar">
-                <span><strong id="oc-total-sessions">0</strong> Sessions</span>
-                <span><strong id="oc-total-errors">0</strong> Errors Fixed</span>
-            </div>
-
-            <div class="oc-sessions-list" id="oc-sessions-list">
-                <!-- Cards injected by opencode.js -->
-            </div>
         </div>
-
-    </div>
     </div>
 
     <!-- Chat Modal (shared by opencode + claudecode) -->
@@ -1929,9 +2071,145 @@
             });
         }
 
-        function setAccent(color, hover) {
+        function setAccent(color, btnDiv) {
+            const mapHover = {
+                '#2bd4bd': '#1fbba4',
+                '#3b82f6': '#2563eb',
+                '#8b5cf6': '#7c3aed',
+                '#f43f5e': '#e11d48',
+                '#f59e0b': '#d97706'
+            };
+            const hover = mapHover[color] || color;
+
+            localStorage.setItem('ts-accent', color);
             document.documentElement.style.setProperty('--accent', color);
             document.documentElement.style.setProperty('--accent-hover', hover);
+
+            // Wait a tick because toggleSwitch recalculates based on var(--accent)
+            setTimeout(() => {
+                document.querySelectorAll('input[type="checkbox"]').forEach(el => toggleSwitch(el));
+            }, 10);
+
+            document.querySelectorAll('.color-swatch').forEach(b => {
+                b.classList.remove('active');
+                b.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            });
+            if (btnDiv) {
+                btnDiv.classList.add('active');
+                btnDiv.style.boxShadow = `0 0 0 2px var(--bg), 0 0 0 4px ${color}`;
+            }
+        }
+
+        function updateGoalDisplay(val) {
+            const display = document.getElementById('goal-value-display');
+            if (display) display.textContent = val + (val == 1 ? ' Hour' : ' Hours');
+        }
+
+        function saveGoal(val) {
+            localStorage.setItem('ts-daily-goal', val);
+        }
+
+        function togglePauseTracking(el) {
+            localStorage.setItem('ts-pause-tracking', el.checked);
+            toggleSwitch(el);
+        }
+
+        function saveSyncFreq(val) {
+            localStorage.setItem('ts-sync-freq', val);
+        }
+
+        function toggleNotifyGoal(el) {
+            localStorage.setItem('ts-notify-goal', el.checked);
+            toggleSwitch(el);
+        }
+
+        function saveProfileData(type, val) {
+            if (type === 'name') {
+                localStorage.setItem('ts-profile-name', val);
+                const el = document.getElementById('sidebar-profile-name');
+                if (el) el.textContent = val || 'Devanshu';
+            } else if (type === 'role') {
+                localStorage.setItem('ts-profile-role', val);
+                const el = document.getElementById('sidebar-profile-role');
+                if (el) el.textContent = val || 'Developer';
+            }
+        }
+
+        function setAvatar(icon, btnDiv) {
+            localStorage.setItem('ts-profile-avatar', icon);
+            const avatarSpan = document.getElementById('sidebar-profile-avatar');
+            if (avatarSpan) {
+                avatarSpan.textContent = icon;
+            }
+
+            document.querySelectorAll('.avatar-swatch').forEach(b => {
+                b.classList.remove('active');
+                b.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                b.style.background = 'var(--sidebar-bg)';
+                b.querySelector('span').style.color = 'var(--text-primary)';
+            });
+            if (btnDiv) {
+                btnDiv.classList.add('active');
+                btnDiv.style.background = 'var(--accent)';
+                btnDiv.style.boxShadow = `0 0 0 2px var(--bg), 0 0 0 4px var(--accent)`;
+                btnDiv.querySelector('span').style.color = '#fff';
+            }
+        }
+
+        function loadSettings() {
+            // Load Profile
+            const pName = localStorage.getItem('ts-profile-name') || 'Devanshu';
+            const pRole = localStorage.getItem('ts-profile-role') || 'Developer';
+            const sName = document.getElementById('sidebar-profile-name');
+            const sRole = document.getElementById('sidebar-profile-role');
+            if (sName) sName.textContent = pName;
+            if (sRole) sRole.textContent = pRole;
+            const inputName = document.getElementById('setting-profile-name');
+            const inputRole = document.getElementById('setting-profile-role');
+            if (inputName) inputName.value = pName;
+            if (inputRole) inputRole.value = pRole;
+
+            const pAvatar = localStorage.getItem('ts-profile-avatar') || 'timeline';
+            let foundSwatch = null;
+            document.querySelectorAll('.avatar-swatch').forEach(b => {
+                if (b.getAttribute('onclick').includes(`'${pAvatar}'`)) {
+                    foundSwatch = b;
+                }
+            });
+            setAvatar(pAvatar, foundSwatch);
+
+            const accent = localStorage.getItem('ts-accent') || '#2bd4bd';
+            setAccent(accent, null);
+            document.querySelectorAll('.color-swatch').forEach(b => {
+                if (b.getAttribute('onclick').includes(accent)) {
+                    b.classList.add('active');
+                    b.style.boxShadow = `0 0 0 2px var(--bg), 0 0 0 4px ${accent}`;
+                }
+            });
+
+            const goal = localStorage.getItem('ts-daily-goal') || 4;
+            const slider = document.getElementById('goal-slider');
+            if (slider) {
+                slider.value = goal;
+                updateGoalDisplay(goal);
+            }
+
+            const pauseTrack = localStorage.getItem('ts-pause-tracking') === 'true';
+            const pauseTrackEl = document.getElementById('setting-pause-tracking');
+            if (pauseTrackEl) {
+                pauseTrackEl.checked = pauseTrack;
+            }
+
+            const syncFreq = localStorage.getItem('ts-sync-freq') || '5';
+            const syncFreqEl = document.getElementById('setting-sync-freq');
+            if (syncFreqEl) syncFreqEl.value = syncFreq;
+
+            const notifyStr = localStorage.getItem('ts-notify-goal');
+            const notifyGoal = notifyStr === null ? true : (notifyStr === 'true');
+            const notifyGoalEl = document.getElementById('setting-notify-goal');
+            if (notifyGoalEl) {
+                notifyGoalEl.checked = notifyGoal;
+            }
         }
 
         function toggleSwitch(input) {
@@ -1939,18 +2217,21 @@
             const track = input.parentElement.querySelector('.sw-track');
             const thumb = input.parentElement.querySelector('.sw-thumb');
 
-            if (isChecked) {
-                track.style.background = 'var(--accent)';
-                thumb.style.transform = 'translateX(20px)';
-            } else {
-                track.style.background = '#334155';
-                thumb.style.transform = 'translateX(0)';
+            if (track && thumb) {
+                if (isChecked) {
+                    track.style.background = 'var(--accent)';
+                    thumb.style.transform = 'translateX(20px)';
+                } else {
+                    track.style.background = '#334155';
+                    thumb.style.transform = 'translateX(0)';
+                }
             }
         }
 
         // ── INIT ──────────────────────────────────────────────────
         async function init() {
-            setAccent('#2bd4bd', '#1fbba4');
+            loadSettings();
+
             const savedMode = localStorage.getItem('ts-mode') || 'dark';
             applyMode(savedMode);
 
