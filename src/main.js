@@ -3,6 +3,8 @@ const path = require('path');
 const http = require('http');
 const fs = require('fs');
 const os = require('os');
+const { agentConfig } = require('./agent/config/settings');
+agentConfig.load();
 
 let mainWindow;
 let tray = null;
@@ -353,6 +355,15 @@ ipcMain.handle('get-opencode-sessions', (_, date) => {
     } catch {
         return [];
     }
+});
+
+ipcMain.handle('get-settings', () => {
+    return agentConfig.getAll();
+});
+
+ipcMain.handle('save-settings', (_, { key, value }) => {
+    agentConfig.set(key, value);
+    return true;
 });
 
 const { registerQueryHandlers } = require('./app/api/query');

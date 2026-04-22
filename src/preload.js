@@ -32,4 +32,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     searchActivities: (query, limit) => ipcRenderer.invoke('search-activities', { query, limit }),
     getStats: (date) => ipcRenderer.invoke('get-stats', date),
     getSources: () => ipcRenderer.invoke('get-sources'),
+    getSettings: () => ipcRenderer.invoke('get-settings'),
+    saveSettings: (payload) => ipcRenderer.invoke('save-settings', payload),
 });
