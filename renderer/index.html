@@ -1331,6 +1331,93 @@
                     </div>
                 </div>
 
+                <!-- ── TRACKING SOURCES ── -->
+                <div style="margin-bottom:32px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                        <span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary)">Tracking Sources</span>
+                        <div style="flex:1;height:1px;background:var(--border)"></div>
+                    </div>
+                    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+                        <!-- Browser History -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:16px">
+                            <div style="display:flex;align-items:center;gap:12px">
+                                <div style="width:34px;height:34px;border-radius:8px;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center">
+                                    <span class="material-symbols-outlined" style="font-size:18px;color:#60a5fa">language</span>
+                                </div>
+                                <div>
+                                    <div style="font-size:14px;font-weight:600;color:var(--text-primary)">Browser History</div>
+                                    <div style="font-size:12px;color:var(--text-secondary)">Track visited pages and reading time</div>
+                                </div>
+                            </div>
+                            <label style="position:relative;display:flex;width:44px;height:26px;cursor:pointer;flex-shrink:0">
+                                <input type="checkbox" id="toggle-browser" style="opacity:0;width:0;height:0;position:absolute">
+                                <span class="toggleswitch"></span>
+                            </label>
+                        </div>
+                        <!-- Browser chips sub-row -->
+                        <div id="browser-chips-row" style="border-top:1px solid var(--border)">
+                            <div id="browser-chips" style="display:flex;gap:8px;flex-wrap:wrap;padding:12px 18px">
+                                <div class="browser-chip" data-browser="chrome">Chrome</div>
+                                <div class="browser-chip" data-browser="firefox">Firefox</div>
+                                <div class="browser-chip" data-browser="brave">Brave</div>
+                                <div class="browser-chip" data-browser="chromium">Chromium</div>
+                            </div>
+                        </div>
+                        <!-- Claude CLI -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:16px;border-top:1px solid var(--border)">
+                            <div style="display:flex;align-items:center;gap:12px">
+                                <div style="width:34px;height:34px;border-radius:8px;background:rgba(43,212,189,0.12);display:flex;align-items:center;justify-content:center">
+                                    <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent)">psychology</span>
+                                </div>
+                                <div>
+                                    <div style="font-size:14px;font-weight:600;color:var(--text-primary)">Claude CLI Sessions</div>
+                                    <div style="font-size:12px;color:var(--text-secondary)">Track coding sessions from Claude Code</div>
+                                </div>
+                            </div>
+                            <label style="position:relative;display:flex;width:44px;height:26px;cursor:pointer;flex-shrink:0">
+                                <input type="checkbox" id="toggle-claudecli" style="opacity:0;width:0;height:0;position:absolute">
+                                <span class="toggleswitch"></span>
+                            </label>
+                        </div>
+                        <!-- OpenCode -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;gap:16px;border-top:1px solid var(--border)">
+                            <div style="display:flex;align-items:center;gap:12px">
+                                <div style="width:34px;height:34px;border-radius:8px;background:rgba(168,85,247,0.12);display:flex;align-items:center;justify-content:center">
+                                    <span class="material-symbols-outlined" style="font-size:18px;color:#c084fc">memory</span>
+                                </div>
+                                <div>
+                                    <div style="font-size:14px;font-weight:600;color:var(--text-primary)">OpenCode Sessions</div>
+                                    <div style="font-size:12px;color:var(--text-secondary)">Track AI coding assistant activity</div>
+                                </div>
+                            </div>
+                            <label style="position:relative;display:flex;width:44px;height:26px;cursor:pointer;flex-shrink:0">
+                                <input type="checkbox" id="toggle-opencode" style="opacity:0;width:0;height:0;position:absolute">
+                                <span class="toggleswitch"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── PRIVACY ── -->
+                <div style="margin-bottom:32px">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+                        <span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-secondary)">Privacy</span>
+                        <div style="flex:1;height:1px;background:var(--border)"></div>
+                    </div>
+                    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:14px 18px">
+                        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Excluded domains — URLs matching these are never tracked</p>
+                        <div id="exclusion-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                            <p style="color:var(--text-secondary);font-size:13px">No exclusions yet — all URLs are tracked</p>
+                        </div>
+                        <div style="display:flex;gap:8px">
+                            <input id="exclusion-input" type="text" placeholder="e.g. reddit.com or *.private.io"
+                                style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text-primary);font-size:13px;outline:none"/>
+                            <button id="exclusion-add-btn"
+                                style="background:var(--accent);color:#0a0f1e;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer">+ Add</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ── DATA EXPORT ── -->
                 <div style="padding-top:24px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:10px">
                     <button
@@ -2231,6 +2318,7 @@
         // ── INIT ──────────────────────────────────────────────────
         async function init() {
             loadSettings();
+            window.TSSettings?.initSettings();
 
             const savedMode = localStorage.getItem('ts-mode') || 'dark';
             applyMode(savedMode);
@@ -2478,6 +2566,19 @@
 
     </script>
     <script src="js/opencode.js"></script>
+    <script src="js/settings.js"></script>
+
+    <!-- ── CLEAR HISTORY CONFIRMATION ── -->
+    <div id="clear-history-dialog" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)">
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:28px;width:380px;max-width:95vw">
+            <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:12px">Clear all history?</h3>
+            <p style="font-size:14px;color:var(--text-secondary);margin-bottom:24px;line-height:1.6">This will permanently delete all tracked activity. This cannot be undone.</p>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button id="clear-history-cancel" style="background:transparent;color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+                <button id="clear-history-confirm" style="background:transparent;color:#f87171;border:1px solid rgba(248,113,113,0.4);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer">Clear All</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 
