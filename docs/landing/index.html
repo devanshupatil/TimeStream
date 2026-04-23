@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TimeStream — Your coding life, automatically recorded.</title>
+    <meta name="description"
+        content="A 100% local, open-source developer productivity tracker. Tracks VS Code, browsers & AI CLI sessions. Zero cloud. Zero subscriptions." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --accent: #2bd4bd;
+            --accent-dim: rgba(43, 212, 189, 0.12);
+            --accent-glow: rgba(43, 212, 189, 0.25);
+            --bg: #07090f;
+            --bg2: #0d1117;
+            --card: #111827;
+            --card2: #161f2e;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f1f5f9;
+            --muted: #64748b;
+            --muted2: #94a3b8;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 48px;
+            background: rgba(7, 9, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            color: var(--muted2);
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .nav-cta {
+            background: var(--accent);
+            color: #0a0f1e;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 140px 24px 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(43, 212, 189, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(43, 212, 189, 0.3);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 999px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 7vw, 80px);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            background: linear-gradient(135deg, #fff 40%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            max-width: 900px;
+        }
+
+        .hero>p {
+            font-size: clamp(16px, 2.5vw, 20px);
+            color: var(--muted2);
+            max-width: 600px;
+            margin-bottom: 48px;
+            line-height: 1.7;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-top: 48px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-stat-num {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .hero-stat-label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* WINDOW FRAME */
+        .app-window {
+            width: 100%;
+            max-width: 960px;
+            margin: 56px auto 0;
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
+        }
+
+        .window-bar {
+            background: var(--card);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot.red {
+            background: #ff5f57;
+        }
+
+        .dot.yellow {
+            background: #febc2e;
+        }
+
+        .dot.green {
+            background: #28c840;
+        }
+
+        .window-title {
+            font-size: 13px;
+            color: var(--muted);
+            margin-left: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .app-window img {
+            width: 100%;
+            display: block;
+        }
+
+        /* SECTIONS */
+        .section {
+            padding: 100px 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-alt {
+            background: var(--bg2);
+        }
+
+        .section-alt .section {
+            background: transparent;
+        }
+
+        .s-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-bottom: 16px;
+        }
+
+        h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .s-sub {
+            font-size: 18px;
+            color: var(--muted2);
+            max-width: 600px;
+            margin-bottom: 56px;
+            line-height: 1.7;
+        }
+
+        /* QUOTE BLOCK */
+        .quote {
+            background: var(--accent-dim);
+            border-left: 3px solid var(--accent);
+            padding: 20px 24px;
+            border-radius: 0 10px 10px 0;
+            font-size: 18px;
+            font-weight: 700;
+            font-style: italic;
+            color: var(--text);
+            margin: 48px 0;
+            max-width: 700px;
+        }
+
+        /* PROBLEM CARDS */
+        .grid3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .problem-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ef4444, transparent);
+        }
+
+        .problem-icon {
+            font-size: 28px;
+            margin-bottom: 16px;
+        }
+
+        .problem-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .problem-card p {
+            font-size: 14px;
+            color: var(--muted2);
+            line-height: 1.6;
+        }
+
+        /* PILLARS */
+        .grid4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .pillar-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all .2s;
+        }
+
+        .pillar-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .pillar-emoji {
+            font-size: 36px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .pillar-card h3 {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .pillar-card p {
+            font-size: 14px;
+            color: var(--muted2);
+            line-height: 1.6;
+        }
+
+        /* WHAT IT TRACKS */
+        .track-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .track-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+        }
+
+        .track-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .track-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .track-table td {
+            padding: 9px 0;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted2);
+            vertical-align: top;
+        }
+
+        .track-table td:first-child {
+            color: var(--text);
+            font-weight: 600;
+            padding-right: 16px;
+            white-space: nowrap;
+            width: 160px;
+        }
+
+        .track-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* YOUTUBE FILTER */
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.9;
+            overflow-x: auto;
+        }
+
+        .code-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .code-pts {
+            color: var(--accent);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .code-label {
+            color: var(--muted2);
+        }
+
+        .code-verdict-pass {
+            color: #34d399;
+            font-weight: 700;
+            margin-top: 12px;
+        }
+
+        .code-verdict-fail {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        /* FEATURES */
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feature-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            transition: border-color .2s;
+        }
+
+        .feature-row:hover {
+            border-color: rgba(43, 212, 189, 0.3);
+        }
+
+        .feature-check {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-dim);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .feature-row h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .feature-row p {
+            font-size: 14px;
+            color: var(--muted2);
+            line-height: 1.6;
+        }
+
+        /* ARCHITECTURE */
+        .arch-box {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 28px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 2;
+            color: var(--muted2);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+
+        .arch-box .hl {
+            color: var(--accent);
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .flow-step {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            padding: 28px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .flow-step:last-child {
+            border-bottom: none;
+        }
+
+        .flow-num {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-dim);
+            border: 1px solid rgba(43, 212, 189, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .flow-step h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .flow-step p {
+            font-size: 14px;
+            color: var(--muted2);
+            line-height: 1.6;
+        }
+
+        .flow-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent);
+            background: var(--accent-dim);
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        /* TECH STACK TABLE */
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tech-table th {
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--muted);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tech-table td {
+            padding: 14px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tech-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tech-table td:first-child {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .tech-table td:nth-child(2) {
+            color: var(--text);
+        }
+
+        .tech-table td:nth-child(3) {
+            color: var(--muted2);
+            font-size: 13px;
+        }
+
+        /* CICD */
+        .cicd-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .cicd-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .cicd-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cicd-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted2);
+            padding: 6px 0;
+        }
+
+        .cicd-step::before {
+            content: '✔';
+            color: var(--accent);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* ROADMAP */
+        .roadmap-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .roadmap-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            font-size: 15px;
+        }
+
+        .roadmap-icon {
+            font-size: 22px;
+        }
+
+        /* SETUP */
+        .setup-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .setup-step {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .setup-step h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent);
+        }
+
+        .setup-step pre {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--muted2);
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .setup-step p {
+            font-size: 14px;
+            color: var(--muted2);
+            line-height: 1.6;
+        }
+
+        /* FOOTER */
+        .footer-wrap {
+            border-top: 1px solid var(--border);
+            padding: 40px 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1100px;
+            margin: 0 auto;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .footer-left {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .footer-left strong {
+            color: var(--accent);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            color: var(--muted);
+            text-decoration: none;
+            transition: color .2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero>* {
+            animation: fadeUp .6s ease both;
+        }
+
+        .hero>*:nth-child(1) {
+            animation-delay: .1s;
+        }
+
+        .hero>*:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .hero>*:nth-child(3) {
+            animation-delay: .3s;
+        }
+
+        .hero>*:nth-child(4) {
+            animation-delay: .4s;
+        }
+
+        .hero>*:nth-child(5) {
+            animation-delay: .5s;
+        }
+
+        .hero>*:nth-child(6) {
+            animation-delay: .6s;
+        }
+
+        @media(max-width: 768px) {
+            nav {
+                padding: 14px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .track-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cicd-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-wrap {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#" class="nav-logo">
+            <div class="nav-logo-icon">⏱️</div>
+            TimeStream
+        </a>
+        <div class="nav-links">
+            <a href="#what-it-tracks">What It Tracks</a>
+            <a href="#features">Features</a>
+            <a href="#architecture">Architecture</a>
+            <a href="#tech">Tech Stack</a>
+            <a href="#setup">Get Started</a>
+        </div>
+        <a href="#setup" class="nav-cta">🚀 Get Started</a>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="badge">⚡ Open Source · 100% Local · Zero Cloud · Zero Cost</div>
+        <h1>Your coding life,<br />automatically recorded.</h1>
+        <p>TimeStream runs silently in your system tray and automatically logs every meaningful developer activity — no
+            manual input, no timers, no friction. Just open your laptop and your day gets recorded.</p>
+
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-num">100%</div>
+                <div class="hero-stat-label">Local & Private</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">$0</div>
+                <div class="hero-stat-label">Forever Free</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">10+</div>
+                <div class="hero-stat-label">Tracked Sources</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">2</div>
+                <div class="hero-stat-label">Browser Extensions</div>
+            </div>
+        </div>
+
+        <div class="app-window">
+            <div class="window-bar">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+                <span class="window-title">TimeStream v1.2.0 — Live Demo</span>
+            </div>
+            <img src="../../TimeStram.gif" alt="TimeStream App Demo" />
+        </div>
+    </div>
+
+    <!-- THE PROBLEM -->
+    <section class="section">
+        <div class="s-tag">The Problem</div>
+        <h2>Can you remember what you did last week?</h2>
+        <p class="s-sub">You code for hours. You watch tutorials. You chat with AI. You browse GitHub. But at the end of
+            the week — can you actually remember what you did? Most developers have zero visibility into their own
+            habits. You can't improve what you can't measure.</p>
+        <div class="quote">🏆 "The developer who reflects grows fastest."</div>
+        <div class="grid3">
+            <div class="problem-card">
+                <div class="problem-icon">☁️</div>
+                <h3>Cloud Data Leaks</h3>
+                <p>Tools like RescueTime upload your private codebase activity, browsing data, and terminal commands to
+                    remote servers you don't control.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">💸</div>
+                <h3>Expensive Subscriptions</h3>
+                <p>WakaTime, Toggl, Clockify all lock their most useful features behind $10–$20/month plans that don't
+                    justify the value.</p>
+            </div>
+            <div class="problem-card">
+                <div class="problem-icon">⏱️</div>
+                <h3>Manual Start/Stop Timers</h3>
+                <p>Nobody actually remembers to clock in and out. Manual tracking is inconsistent, inaccurate, and adds
+                    cognitive friction to your flow.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CORE PILLARS -->
+    <div class="section-alt">
+        <div class="section">
+            <div class="s-tag">Core Pillars</div>
+            <h2>Built on 4 unbreakable principles</h2>
+            <p class="s-sub">Every design decision in TimeStream is driven by what developers actually need.</p>
+            <div class="grid4">
+                <div class="pillar-card"><span class="pillar-emoji">⚡</span>
+                    <h3>Zero-Friction</h3>
+                    <p>Install once and forget it. TimeStream runs silently in your system tray, capturing everything
+                        automatically without interrupting your flow.</p>
+                </div>
+                <div class="pillar-card"><span class="pillar-emoji">🔒</span>
+                    <h3>100% Private</h3>
+                    <p>Every byte of your data stays on your hard drive. No cloud sync, no remote analytics, no
+                        third-party servers. TimeStream can never see your data.</p>
+                </div>
+                <div class="pillar-card"><span class="pillar-emoji">🤖</span>
+                    <h3>AI Intelligence</h3>
+                    <p>Natively parses Claude Code & OpenCode terminal sessions to surface exactly what files you
+                        changed, how long you worked, and how many errors were fixed.</p>
+                </div>
+                <div class="pillar-card"><span class="pillar-emoji">🎨</span>
+                    <h3>Developer-First</h3>
+                    <p>Oceanic Dark/Light modes, live dynamic CSS accent colors, streak gamification, and personalized
+                        emoji developer profiles.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHAT IT TRACKS -->
+    <section class="section" id="what-it-tracks">
+        <div class="s-tag">What TimeStream Tracks</div>
+        <h2>Everything you build, browse & learn</h2>
+        <p class="s-sub">TimeStream captures your full developer workflow across every tool you use — automatically.</p>
+        <div class="track-grid">
+            <div class="track-card">
+                <h3>🌐 Browser Activity</h3>
+                <table class="track-table">
+                    <tr>
+                        <td>🎬 YouTube</td>
+                        <td>Educational videos (smart AI filter)</td>
+                    </tr>
+                    <tr>
+                        <td>🐙 GitHub</td>
+                        <td>Repos, PRs, issues, commits</td>
+                    </tr>
+                    <tr>
+                        <td>🤖 ChatGPT</td>
+                        <td>Your conversation topics</td>
+                    </tr>
+                    <tr>
+                        <td>🧠 Claude AI</td>
+                        <td>Your AI prompts & sessions</td>
+                    </tr>
+                    <tr>
+                        <td>🔍 Perplexity</td>
+                        <td>Research queries</td>
+                    </tr>
+                    <tr>
+                        <td>💬 Reddit</td>
+                        <td>Tech & programming posts</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="track-card">
+                <h3>💻 Local Dev Activity</h3>
+                <table class="track-table">
+                    <tr>
+                        <td>⚡ OpenCode</td>
+                        <td>Coding sessions + duration</td>
+                    </tr>
+                    <tr>
+                        <td>🤖 Claude CLI</td>
+                        <td>Agent conversations</td>
+                    </tr>
+                    <tr>
+                        <td>📊 Learning time</td>
+                        <td>Exact minutes spent learning</td>
+                    </tr>
+                    <tr>
+                        <td>🔥 Daily streaks</td>
+                        <td>Consecutive active days</td>
+                    </tr>
+                    <tr>
+                        <td>📈 Weekly patterns</td>
+                        <td>Your peak productivity hours</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- YOUTUBE FILTER -->
+    <div class="section-alt">
+        <div class="section">
+            <div class="s-tag">Smart Intelligence</div>
+            <h2>How smart is the YouTube filter?</h2>
+            <p class="s-sub">Most tracking apps log everything. TimeStream uses a multi-signal scoring algorithm to
+                decide if a YouTube video is actually educational before logging it.</p>
+            <div class="code-block">
+                <div class="code-line"><span class="code-pts">+4 pts</span><span class="code-label">📌 Strong learning
+                        keyword in title ("tutorial", "how to", "explained")</span></div>
+                <div class="code-line"><span class="code-pts">+1.5</span><span class="code-label">🏷️ Tech keyword in
+                        title ("React", "Docker", "Python"...)</span></div>
+                <div class="code-line"><span class="code-pts">+4 pts</span><span class="code-label">🎓 Known educational
+                        channel (Fireship, FreeCodeCamp, NeetCode...)</span></div>
+                <div class="code-line"><span class="code-pts">+0.5</span><span class="code-label">📝 Educational cues in
+                        description ("source code", "follow along"...)</span></div>
+                <div class="code-line"><span class="code-pts">+0.5</span><span class="code-label">#️⃣ Tech hashtags
+                        found in description</span></div>
+                <br />
+                <div>Score ≥ 3 → <span style="color:#34d399;font-weight:700;">✅ Logged as "Learning"</span></div>
+                <div>Score &lt; 3 → <span style="color:#f87171;font-weight:700;">❌ Silently ignored</span></div>
+                <br />
+                <div class="code-verdict-fail">"Top 10 Minecraft Moments" — ignored.</div>
+                <div class="code-verdict-pass">"Building a REST API with Node.js — Full Tutorial" — logged ✅</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+        <div class="s-tag">Core Features</div>
+        <h2>Everything you need.<br />Nothing you don't.</h2>
+        <p class="s-sub">TimeStream covers your full developer workflow from a beautiful dashboard to deep AI session
+            intelligence.</p>
+        <div class="feature-list">
+            <div class="feature-row">
+                <div class="feature-check">📊</div>
+                <div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>See your weekly and monthly activity bar chart. Find out which category consumes most of your
+                        time — Coding, Learning, Research, or DevOps. All from real data, zero guesswork. Includes daily
+                        goal progress and streak counters.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-check">🕐</div>
+                <div>
+                    <h3>Timeline View</h3>
+                    <p>A chronological feed of everything you did, hour by hour. Filter by category. Click any card to
+                        re-open the source. Think of it as your personal developer logbook — automatically written for
+                        you every day.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-check">🧠</div>
+                <div>
+                    <h3>AI Session Learnings (Unique Feature)</h3>
+                    <p>TimeStream imports your OpenCode and Claude CLI sessions — including project context,
+                        conversation summaries, session duration, files modified, and errors fixed — into a dedicated
+                        Learnings view. No other time tracker does this.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-check">🔎</div>
+                <div>
+                    <h3>Powerful Search</h3>
+                    <p>Instantly search across your entire history. <em>"What was that React tutorial I watched last
+                            week?"</em> — found in milliseconds. Full-text search across titles, categories, and
+                        sources.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-check">🎨</div>
+                <div>
+                    <h3>Full Theme Customization</h3>
+                    <p>Oceanic Dark & Light modes. Live dynamic CSS accent color injection — choose from Teal, Blue,
+                        Violet, Rose, or Amber. Personalized emoji developer profile with name, role, and avatar
+                        selector. All persisted instantly via localStorage.</p>
+                </div>
+            </div>
+            <div class="feature-row">
+                <div class="feature-check">🔒</div>
+                <div>
+                    <h3>100% Local & Private</h3>
+                    <p>All data lives on your machine. There is no server. No cloud. No tracking. No accounts.
+                        TimeStream can never see your data. The local Node.js server is only accessible from your own
+                        machine at localhost:3000.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <div class="section-alt">
+        <div class="section" id="architecture">
+            <div class="s-tag">Architecture</div>
+            <h2>How it works under the hood</h2>
+            <p class="s-sub">A clean, local-first data pipeline engineered for reliability and privacy.</p>
+            <div class="arch-box">
+                <div>┌─────────────────────────────────────────────────────────────┐</div>
+                <div>│
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="hl">YOUR BROWSER</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    │</div>
+                <div>│ &nbsp;Chrome / Firefox Extension silently watches your tabs &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │
+                </div>
+                <div>│ &nbsp;▸ Detects GitHub, YouTube, Reddit, AI tools
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │</div>
+                <div>│ &nbsp;▸ Applies smart filters (3-min rule + content scoring) &nbsp;&nbsp;&nbsp; │</div>
+                <div>└──────────────────────────┬──────────────────────────────────┘</div>
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    │ <span class="hl">POST localhost:3000/api/activity</span></div>
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ▼</div>
+                <div>┌─────────────────────────────────────────────────────────────┐</div>
+                <div>│ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+                        class="hl">TIMESTREAM DESKTOP APP</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    │</div>
+                <div>│ &nbsp;Electron main process receives and deduplicates events &nbsp;&nbsp;&nbsp;│</div>
+                <div>│ &nbsp;▸ Persists to local JSON (activities.json)
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │
+                </div>
+                <div>│ &nbsp;▸ Watches OpenCode + Claude CLI session files
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │</div>
+                <div>│ &nbsp;▸ Sends live updates to the renderer via IPC
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; │</div>
+                <div>└──────────────────────────┬──────────────────────────────────┘</div>
+                <div>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ▼</div>
+                <div>┌─────────────────────────────────────────────────────────────┐</div>
+                <div>│
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="hl">YOUR DASHBOARD</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    │</div>
+                <div>│ &nbsp;Beautiful UI: Timeline · Analytics · Search · Learnings &nbsp;&nbsp; │</div>
+                <div>└─────────────────────────────────────────────────────────────┘</div>
+            </div>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="flow-num">1</div>
+                    <div>
+                        <h3>Browser Extension Logs Your Activity</h3>
+                        <p>The custom Chrome (Manifest V3) and Firefox extension silently monitors your tabs. It applies
+                            a smart 3-minute rule and content scoring algorithm before logging anything — noise is
+                            filtered out automatically.</p><span class="flow-code">chrome-extension/ ·
+                            firefox-extension/</span>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">2</div>
+                    <div>
+                        <h3>Data POSTs to Your Local Node.js Server</h3>
+                        <p>The extension securely POSTs activity data to <code
+                                style="color:var(--accent)">localhost:3000</code> — a lightweight HTTP server running
+                            inside Electron. Only your machine can reach it. Full CORS protection applied.</p><span
+                            class="flow-code">POST localhost:3000/api/activity</span>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">3</div>
+                    <div>
+                        <h3>Async Write Queue Safely Persists Data</h3>
+                        <p>An async write-queue deduplicates and safely writes all data to a local JSON file, preventing
+                            corruption under heavy concurrent I/O load. Activities are capped at 1,000 entries with
+                            smart deduplication.</p><span class="flow-code">~/.config/TimeStream/activities.json</span>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">4</div>
+                    <div>
+                        <h3>File Watcher Monitors AI CLI Sessions</h3>
+                        <p>A Node.js <code style="color:var(--accent)">fs.watch()</code> observer monitors your OpenCode
+                            and Claude CLI session directories in real-time, parsing raw JSON logs into structured
+                            session cards automatically.</p><span class="flow-code">~/.opencode/sessions/ ·
+                            ~/.claude/projects/</span>
+                    </div>
+                </div>
+                <div class="flow-step">
+                    <div class="flow-num">5</div>
+                    <div>
+                        <h3>Beautiful Dashboard Renders Everything</h3>
+                        <p>All data is visualized across the Dashboard, Timeline, Learnings, Analytics, and Search pages
+                            — built with Vanilla JS and dynamic CSS variable theming via Electron IPC.</p><span
+                            class="flow-code">Electron IPC · renderer/index.html</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <section class="section" id="tech">
+        <div class="s-tag">Tech Stack</div>
+        <h2>Built with modern, battle-tested tools</h2>
+        <p class="s-sub">Carefully chosen for reliability, performance, and zero-friction developer experience.</p>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;">
+            <table class="tech-table">
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technology</th>
+                        <th>Why</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Desktop</td>
+                        <td>Electron 41</td>
+                        <td>Linux-first native cross-platform app</td>
+                    </tr>
+                    <tr>
+                        <td>Extension</td>
+                        <td>Manifest V3 (Chrome + Firefox)</td>
+                        <td>Secure, modern extension API</td>
+                    </tr>
+                    <tr>
+                        <td>File Watching</td>
+                        <td>chokidar 5</td>
+                        <td>Reliable cross-platform FS events</td>
+                    </tr>
+                    <tr>
+                        <td>Local DB</td>
+                        <td>better-sqlite3</td>
+                        <td>Fast, zero-config embedded SQL</td>
+                    </tr>
+                    <tr>
+                        <td>Frontend</td>
+                        <td>Vanilla JS + CSS</td>
+                        <td>Zero build step, fast iteration</td>
+                    </tr>
+                    <tr>
+                        <td>Packaging</td>
+                        <td>electron-builder</td>
+                        <td>AppImage + .deb for Linux</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CD</td>
+                        <td>GitHub Actions</td>
+                        <td>Automated builds, testing & releases</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CI/CD -->
+        <div style="margin-top: 64px;">
+            <div class="s-tag">CI/CD Pipeline</div>
+            <h2 style="font-size:28px;">Automated from push to release</h2>
+            <p style="font-size:16px;color:var(--muted2);margin-bottom:0;">GitHub Actions handles automated testing,
+                extension packaging, and release creation on every version tag push.</p>
+            <div class="cicd-grid">
+                <div class="cicd-card">
+                    <h3>⚡ Continuous Integration <span style="font-size:11px;color:var(--muted);font-weight:400;">(every
+                            push to main)</span></h3>
+                    <div class="cicd-step">Install dependencies</div>
+                    <div class="cicd-step">Validate manifests (jq)</div>
+                    <div class="cicd-step">Package Chrome extension</div>
+                    <div class="cicd-step">Package Firefox extension</div>
+                    <div class="cicd-step">Upload build artifacts</div>
+                </div>
+                <div class="cicd-card">
+                    <h3>🚀 Release Workflow <span style="font-size:11px;color:var(--muted);font-weight:400;">(on version
+                            tag push)</span></h3>
+                    <div class="cicd-step">Build extension zip</div>
+                    <div class="cicd-step">Create GitHub Release</div>
+                    <div class="cicd-step">Attach extension files</div>
+                    <div class="cicd-step">Auto-generate changelog</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <div class="section-alt">
+        <div class="section">
+            <div class="s-tag">What's Coming Next</div>
+            <h2>The roadmap ahead</h2>
+            <p class="s-sub">TimeStream is actively developed. Here is what's on the horizon.</p>
+            <div class="roadmap-list">
+                <div class="roadmap-item"><span class="roadmap-icon">🗓️</span><span><strong>GitHub-style
+                            heatmap</strong> — see your consistency at a glance</span></div>
+                <div class="roadmap-item"><span class="roadmap-icon">📁</span><span><strong>Project tagging</strong> —
+                        group activities into named projects</span></div>
+                <div class="roadmap-item"><span class="roadmap-icon">📤</span><span><strong>Weekly Markdown
+                            reports</strong> — export your week to share or reflect</span></div>
+                <div class="roadmap-item"><span class="roadmap-icon">💻</span><span><strong>VS Code extension</strong> —
+                        track files and features you touch</span></div>
+                <div class="roadmap-item"><span class="roadmap-icon">🍅</span><span><strong>Pomodoro
+                            integration</strong> — link focus sessions to activities</span></div>
+                <div class="roadmap-item"><span class="roadmap-icon">🌍</span><span><strong>Multi-language
+                            support</strong></span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GET STARTED -->
+    <section class="section" id="setup">
+        <div class="s-tag">Setup Guide</div>
+        <h2>Get started in 5 minutes</h2>
+        <p class="s-sub">TimeStream runs on Linux (Ubuntu 20.04+ recommended) and requires Node.js v18+ and npm v8+.</p>
+        <div class="setup-steps">
+            <div class="setup-step">
+                <h3>Step 1 — Prerequisites</h3>
+                <p>Make sure you have Node.js v18+, npm v8+, and build tools installed.</p>
+                <pre>sudo apt install build-essential</pre>
+            </div>
+            <div class="setup-step">
+                <h3>Step 2 — Clone & Install</h3>
+                <pre>git clone https://github.com/[your-repo]/TimeStream.git
+cd TimeStream
+npm install && npx @electron/rebuild</pre>
+            </div>
+            <div class="setup-step">
+                <h3>Step 3 — Run the App</h3>
+                <pre>npm run dev</pre>
+            </div>
+            <div class="setup-step">
+                <h3>Step 4 — Install the Browser Extension</h3>
+                <p><strong>Chrome:</strong> Go to <code>chrome://extensions</code> → Enable Developer Mode → Load
+                    Unpacked → select <code>chrome-extension/</code></p>
+                <br />
+                <p><strong>Firefox:</strong> Go to <code>about:debugging</code> → This Firefox → Load Temporary Add-on →
+                    select <code>firefox-extension/manifest.json</code></p>
+            </div>
+            <div class="setup-step">
+                <h3>Step 5 — Browse Normally</h3>
+                <p>TimeStream is now active. Open GitHub, watch a tutorial, chat with AI — your timeline will populate
+                    automatically within minutes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-wrap">
+            <div class="footer-left">Built with ❤️ by <strong>Devanshu Patil</strong> · MIT License · Free to use, fork
+                & contribute</div>
+            <div class="footer-links">
+                <a href="https://www.linkedin.com/in/devanshu-patil-973334266">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
