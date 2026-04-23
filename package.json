@@ -15,7 +15,8 @@
     "dev": "electron . --dev --no-sandbox",
     "start": "electron . --no-sandbox",
     "test": "node --test tests/",
-    "build": "electron-builder --linux",
+    "build:css": "tailwindcss -i renderer/styles/input.css -o renderer/styles/tailwind.css",
+    "build": "bun run build:css && electron-builder --linux",
     "build:deb": "electron-builder --linux deb",
     "build:appimage": "electron-builder --linux AppImage",
     "build:win": "electron-builder --win"
@@ -59,7 +60,9 @@
   },
   "devDependencies": {
     "@electron/rebuild": "^3.7.2",
+    "@tailwindcss/cli": "^4.2.4",
     "electron": "^41.0.3",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "tailwindcss": "^4.2.4"
   }
 }
