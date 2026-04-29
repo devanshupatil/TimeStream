@@ -1,0 +1,9 @@
+node_modules/
+dist/
+dist-electron/
+release/
+*.log
+.DS_Store
+package-lock.json
+claude-test-*.json
+oc-test-*.json

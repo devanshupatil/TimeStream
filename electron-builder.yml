@@ -1,0 +1,52 @@
+# electron-builder.yml
+
+# Unique ID for your app — used by OS to identify the app across updates
+appId: com.devanshupatil.timestream
+
+# Name shown to users (in taskbar, app menu, installer)
+productName: TimeStream
+
+copyright: Copyright © 2026 Devanshu Prakash Patil
+
+directories:
+  output: release    # all built installers go into the release/ folder
+
+# Which files to bundle into the installer
+files:
+  - src/main/**       # main process code
+  - src/preload/**    # preload bridge
+  - dist/renderer/**  # compiled React (must run build:renderer first)
+  - package.json      # electron-updater reads version from here
+
+# Where to publish releases — electron-updater will also check this URL for updates
+publish:
+  provider: github
+  owner: devanshupatil
+  repo: TimeStream
+
+# Linux: two formats
+# AppImage = portable, runs on any Linux without installing
+# deb = Debian/Ubuntu package manager format
+linux:
+  target:
+    - target: AppImage
+    - target: deb
+  category: Development   # where it appears in app menus
+
+# Windows: NSIS = standard Windows installer with wizard
+win:
+  target:
+    - target: nsis
+      arch: [x64]   # 64-bit only (covers 99% of Windows machines)
+
+# macOS: DMG = drag-to-Applications disk image (standard Mac distribution)
+mac:
+  target:
+    - target: dmg
+
+# NSIS installer options (Windows)
+nsis:
+  oneClick: false                          # show installer wizard, don't just silently install
+  allowToChangeInstallationDirectory: true # user can pick where to install
+  createDesktopShortcut: true              # add icon to desktop
+  createStartMenuShortcut: true            # add to Start Menu
