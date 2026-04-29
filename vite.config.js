@@ -4,9 +4,10 @@ import path from 'path'
 
 export default defineConfig({
     plugins: [react()],
-    root: 'src/renderer',          // where index.html lives
+    root: 'src/renderer',
+    base: './',                    // relative asset paths so file:// loads work in Electron
     build: {
-        outDir: '../../dist/renderer' // where to output compiled files
+        outDir: '../../dist/renderer'
     },
     server: { port: 5173 },        // dev server port (Electron connects to this)
     test: {
